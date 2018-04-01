@@ -270,8 +270,8 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
+	vec3f getAmbientLight() const;
 	
-
 private:
     list<Geometry*> objects;
 	list<Geometry*> nonboundedobjects;
@@ -279,6 +279,8 @@ private:
     list<Light*> lights;
     Camera camera;
 	
+	vec3f ambient_light;
+
 	// Each object in the scene, provided that it has hasBoundingBoxCapability(),
 	// must fall within this bounding box.  Objects that don't have hasBoundingBoxCapability()
 	// are exempt from this requirement.

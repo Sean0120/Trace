@@ -199,3 +199,8 @@ void Scene::initScene()
 			nonboundedobjects.push_back(*j);
 	}
 }
+
+vec3f Scene::getAmbientLight() const {
+	return ambient_light;
+}
+
