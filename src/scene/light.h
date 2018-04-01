@@ -47,6 +47,9 @@ public:
 
 protected:
 	vec3f position;
+	double constant_falloff;
+	double linear_falloff;
+	double quadratic_falloff;
 };
 
 #endif // __LIGHT_H__

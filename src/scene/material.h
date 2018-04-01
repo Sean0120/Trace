@@ -41,7 +41,7 @@ public:
     
     double shininess;
     double index;               // index of refraction
-
+	double ambientLight;
     
                                 // material with zero coeffs for everything
                                 // as opposed to the "default" material which is
