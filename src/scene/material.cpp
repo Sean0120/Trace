@@ -31,9 +31,9 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 		
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
 		vec3f uV = -(r.getDirection().normalize());
-		spec_term = ks * maximum(0, pow(uR.dot(uV), shininess*128.0));
+		spec_term = ks * pow(maximum(0, uR.dot(uV)), shininess*128.0);
 
-		vec3f atten = prod((*it)->getColor() ,(*it)->shadowAttenuation(P)*(*it)->distanceAttenuation(P));
+		vec3f atten = prod((*it)->getColor(P) ,(*it)->shadowAttenuation(P)*(*it)->distanceAttenuation(P));
 		I += prod(atten, (diffuse_term + spec_term));
 	}
 	return I;
