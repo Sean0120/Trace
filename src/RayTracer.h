@@ -5,6 +5,7 @@
 
 #include "scene/scene.h"
 #include "scene/ray.h"
+#include <stack>
 
 class RayTracer
 {
@@ -33,6 +34,8 @@ private:
 	Scene *scene;
 
 	bool m_bSceneLoaded;
+
+	stack<double> index;
 };
 
 #endif // __RAYTRACER_H__
