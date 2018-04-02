@@ -261,7 +261,9 @@ public:
 	}
 	void add( Light* light )
 	{ lights.push_back( light ); }
-
+	void set_ambient_light(vec3f ambient_light) {
+		this->ambient_light = ambient_light;
+	}
 	bool intersect( const ray& r, isect& i ) const;
 	void initScene();
 

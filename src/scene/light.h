@@ -44,7 +44,15 @@ public:
 	virtual double distanceAttenuation( const vec3f& P ) const;
 	virtual vec3f getColor( const vec3f& P ) const;
 	virtual vec3f getDirection( const vec3f& P ) const;
-
+	void set_constant_falloff(double constant) {
+		constant_falloff = constant;
+	}
+	void set_linear_falloff(double linear) {
+		linear_falloff = linear;
+	}
+	void set_quadratic_falloff(double quadratic) {
+		quadratic_falloff = quadratic;
+	}
 protected:
 	vec3f position;
 	double constant_falloff;
