@@ -1,6 +1,8 @@
 #include <cmath>
 
 #include "light.h"
+#include "../ui/TraceUI.h"
+extern TraceUI* traceUI;
 
 double DirectionalLight::distanceAttenuation( const vec3f& P ) const
 {
@@ -53,11 +55,13 @@ double PointLight::distanceAttenuation( const vec3f& P ) const
 	// You'll need to modify this method to attenuate the intensity 
 	// of the light based on the distance between the source and the 
 	// point P.  For now, I assume no attenuation and just return 1.0
-
-	double atten = ((position - P).length_squared()*quadratic_falloff + (position - P).length()*linear_falloff + constant_falloff);
-	if (atten == RAY_EPSILON)
+	double cA = traceUI->getConstAttenuation();
+	double lA = traceUI->getLinearAttenuation();
+	double qA = traceUI->getQuadraAttenuation();
+	double atten = ((position - P).length_squared()*qA + (position - P).length()*lA + cA);
+	if (abs(atten)<=RAY_EPSILON)
 		return 1;
-	return minimum(0.0,1 / atten);
+	return minimum(1.0, 1.0 / atten);
 
 }
 

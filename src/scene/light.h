@@ -2,6 +2,8 @@
 #define __LIGHT_H__
 
 #include "scene.h"
+#include "../ui/TraceUI.h"
+extern TraceUI* traceUI;
 
 class Light
 	: public SceneElement
@@ -46,12 +48,15 @@ public:
 	virtual vec3f getDirection( const vec3f& P ) const;
 	void set_constant_falloff(double constant) {
 		constant_falloff = constant;
+		traceUI->setConstAttenuation(constant);
 	}
 	void set_linear_falloff(double linear) {
 		linear_falloff = linear;
+		traceUI->setLinearAttenuation(linear);
 	}
 	void set_quadratic_falloff(double quadratic) {
 		quadratic_falloff = quadratic;
+		traceUI->setQuadraAttenuation(quadratic);
 	}
 protected:
 	vec3f position;

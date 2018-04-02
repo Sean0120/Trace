@@ -96,6 +96,18 @@ void TraceUI::cb_thresholdSlides(Fl_Widget* o, void* v)
 	((TraceUI*)(o->user_data()))->m_nthreshold = double(((Fl_Slider *)o)->value());
 }
 
+void TraceUI::cb_constAttenSlides(Fl_Widget* o, void* v) {
+	((TraceUI*)(o->user_data()))->m_nconstAtten = double(((Fl_Slider *)o)->value());
+}
+
+void TraceUI::cb_linearAttenSlides(Fl_Widget* o, void* v) {
+	((TraceUI*)(o->user_data()))->m_nlinearAtten = double(((Fl_Slider *)o)->value());
+}
+
+void TraceUI::cb_quadraAttenSlides(Fl_Widget* o, void* v) {
+	((TraceUI*)(o->user_data()))->m_nquadraAtten = double(((Fl_Slider *)o)->value());
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -202,6 +214,33 @@ double TraceUI::getThreshold() {
 	return m_nthreshold;
 }
 
+double TraceUI::getConstAttenuation() {
+	return m_nconstAtten;
+}
+
+double TraceUI::getLinearAttenuation() {
+	return m_nlinearAtten;
+}
+
+double TraceUI::getQuadraAttenuation() {
+	return m_nquadraAtten;
+}
+//following three functions are only called once when loading 
+void TraceUI::setConstAttenuation(double value) {
+	m_nconstAtten = value;
+	m_constAttenSlider->value(value);
+}
+
+void TraceUI::setLinearAttenuation(double value) {
+	m_nlinearAtten = value;
+	m_linearAttenSlider->value(value);
+}
+
+void TraceUI::setQuadraAttenuation(double value) {
+	m_nquadraAtten = value;
+	m_quadraAttenSlider->value(value);
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -222,10 +261,14 @@ TraceUI::TraceUI() {
 	m_nDepth = 0;
 	m_nSize = 150;
 	m_nthreshold = 0;
-	m_mainWindow = new Fl_Window(100, 40, 320, 100, "Ray <Not Loaded>");
+	m_nconstAtten = 0.5;
+	m_nlinearAtten = 0.2;
+	m_nquadraAtten = 0.0;
+
+	m_mainWindow = new Fl_Window(100, 40, 350, 200, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
-		m_menubar = new Fl_Menu_Bar(0, 0, 320, 25);
+		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
 		m_menubar->menu(menuitems);
 
 		// install slider depth
@@ -266,6 +309,43 @@ TraceUI::TraceUI() {
 		m_thresholdSlider->value(m_nthreshold);
 		m_thresholdSlider->align(FL_ALIGN_RIGHT);
 		m_thresholdSlider->callback(cb_thresholdSlides);
+
+		//install const attenuation coeff slider
+		m_constAttenSlider = new Fl_Value_Slider(10, 105, 200, 20, "Const Atten Coeff");
+		m_constAttenSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_constAttenSlider->type(FL_HOR_NICE_SLIDER);
+		m_constAttenSlider->labelfont(FL_COURIER);
+		m_constAttenSlider->labelsize(12);
+		m_constAttenSlider->minimum(0.00);
+		m_constAttenSlider->maximum(1.00);
+		m_constAttenSlider->step(0.01);
+		m_constAttenSlider->value(m_nconstAtten);
+		m_constAttenSlider->align(FL_ALIGN_RIGHT);
+		m_constAttenSlider->callback(cb_constAttenSlides);
+		//linear attenuation
+		m_linearAttenSlider = new Fl_Value_Slider(10, 130, 200, 20, "Linear Atten Coeff");
+		m_linearAttenSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_linearAttenSlider->type(FL_HOR_NICE_SLIDER);
+		m_linearAttenSlider->labelfont(FL_COURIER);
+		m_linearAttenSlider->labelsize(12);
+		m_linearAttenSlider->minimum(0.00);
+		m_linearAttenSlider->maximum(1.00);
+		m_linearAttenSlider->step(0.01);
+		m_linearAttenSlider->value(m_nlinearAtten);
+		m_linearAttenSlider->align(FL_ALIGN_RIGHT);
+		m_linearAttenSlider->callback(cb_linearAttenSlides);
+		//quadratic attenuation
+		m_quadraAttenSlider = new Fl_Value_Slider(10, 155, 200, 20, "Quadra Atten Coeff");
+		m_quadraAttenSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_quadraAttenSlider->type(FL_HOR_NICE_SLIDER);
+		m_quadraAttenSlider->labelfont(FL_COURIER);
+		m_quadraAttenSlider->labelsize(12);
+		m_quadraAttenSlider->minimum(0.00);
+		m_quadraAttenSlider->maximum(1.00);
+		m_quadraAttenSlider->step(0.01);
+		m_quadraAttenSlider->value(m_nquadraAtten);
+		m_quadraAttenSlider->align(FL_ALIGN_RIGHT);
+		m_quadraAttenSlider->callback(cb_quadraAttenSlides);
 
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");

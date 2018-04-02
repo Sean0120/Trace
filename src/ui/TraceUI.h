@@ -31,7 +31,9 @@ public:
 	Fl_Slider*			m_thresholdSlider;
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
-	
+	Fl_Slider*			m_constAttenSlider;
+	Fl_Slider*			m_linearAttenSlider;
+	Fl_Slider*			m_quadraAttenSlider;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -43,12 +45,22 @@ public:
 	int			getSize();
 	int			getDepth();
 	double		getThreshold();
+	double		getConstAttenuation();
+	double		getLinearAttenuation();
+	double		getQuadraAttenuation();
+	void		setConstAttenuation(double value);
+	void		setLinearAttenuation(double value);
+	void		setQuadraAttenuation(double value);
+
 private:
 	RayTracer*	raytracer;
 
 	int			m_nSize;
 	int			m_nDepth;
 	double		m_nthreshold;
+	double		m_nconstAtten;
+	double		m_nlinearAtten;
+	double		m_nquadraAtten;
 	
 
 // static class members
@@ -66,6 +78,9 @@ private:
 	static void cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_depthSlides(Fl_Widget* o, void* v);
 	static void cb_thresholdSlides(Fl_Widget* o, void* v);
+	static void cb_constAttenSlides(Fl_Widget* o, void* v);
+	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
+	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
