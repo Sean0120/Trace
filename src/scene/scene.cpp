@@ -32,6 +32,7 @@ bool BoundingBox::intersects(const vec3f& point) const
 // Using Kay/Kajiya algorithm.
 bool BoundingBox::intersect(const ray& r, double& tMin, double& tMax) const
 {
+
 	vec3f R0 = r.getPosition();
 	vec3f Rd = r.getDirection();
 
@@ -54,12 +55,13 @@ bool BoundingBox::intersect(const ray& r, double& tMin, double& tMax) const
 		double t1 = v1/vd;
 		double t2 = v2/vd;
 		
-		if ( t1 > t2 ) { // swap t1 & t2
+		if ( t1 > t2 ) { // swap t1 & t2,let t1 < t2
 			ttemp = t1;
 			t1 = t2;
 			t2 = ttemp;
 		}
 
+		//usually this will replace tMin and tMax with t1 and t2
 		if (t1 > tMin)
 			tMin = t1;
 		if (t2 < tMax)
@@ -67,7 +69,7 @@ bool BoundingBox::intersect(const ray& r, double& tMin, double& tMax) const
 
 		if (tMin > tMax) // box is missed
 			return false;
-		if (tMax < 0.0) // box is behind ray
+		if (tMax < RAY_EPSILON) // box is behind ray
 			return false;
 	}
 	return true; // it made it past all 3 axes.
@@ -83,6 +85,7 @@ bool Geometry::intersect(const ray&r, isect&i) const
     dir /= length;
 
     ray localRay( pos, dir );
+	//cout << pos << dir << endl;
 
     if (intersectLocal(localRay, i)) {
         // Transform the intersection point & normal returned back into global space.
