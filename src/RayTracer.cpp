@@ -17,9 +17,9 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	
+	index = stack<double>();
 	index.push(1.0);
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 10 ).clamp();
+	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 1 ).clamp();
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -27,8 +27,8 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 vec3f RayTracer::traceRay( Scene *scene, const ray& r, 
 	const vec3f& thresh, int depth )
 {	
-	if (depth <= 0)
-		return vec3f(0, 0, 0); //terminate recursion
+	//if (depth <= 0)
+		//return vec3f(0, 0, 0); //terminate recursion
 
 	isect i;
 
@@ -46,25 +46,39 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		double curI = index.top();
 		vec3f P = r.at(i.t);
 		const Material& m = i.getMaterial();
-		index.push(m.index);
+		if (depth <= 0)
+			return m.shade(scene, r, i);
+
+		index.push(curI);
+		bool get_out = (abs(curI - m.index) < RAY_EPSILON);
+		vec3f uN = i.N.normalize();
 		vec3f I = m.shade(scene, r, i);
 		vec3f uL = -(r.getDirection().normalize());
-		vec3f uN = i.N.normalize();
+		//vec3f uN = i.N.normalize();
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
 		ray reflected_ray(P, uR);
+		if(!m.kr.iszero())
 		I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
+		index.pop();
 
-		double ratio = curI / m.index;
+		if (get_out) {
+			uN = -uN;
+			index.push(1.0);
+		}
+		else
+			index.push(m.index);
+		double ratio = curI / index.top();
 		double cosi = uL.dot(uN);
 		bool total_reflect = (sqrt(1 - cosi * cosi)>= 1/ratio);
 		if (!total_reflect) {
 			double cost = sqrt(1 - ratio * ratio*(1 - cosi * cosi));
 			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
 			ray refracted_ray(P, uT);
+			if(!m.kt.iszero())
 			I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
 		}
-
 		index.pop();
+
 		return I.clamp();
 	
 	} else {
