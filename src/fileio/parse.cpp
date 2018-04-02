@@ -50,7 +50,8 @@ static void eatNL( istream& is )
 static bool eat( istream& is ) 
 {
 	while( is ) {
-		eatWS( is );
+		eatWS( is );//remove all the " " at the beginning
+		//the following code is for removing the comments
 		if( is ) {
 			int ch = is.peek();
 			if( ch == '/' ) {
@@ -232,6 +233,7 @@ static Obj *readDict( istream& is )
 
 static Obj *readObject( istream& is )
 {
+	//eat function remove all the " " and comments
 	if( !eat( is ) ) {
 		return NULL;
 	}

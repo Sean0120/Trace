@@ -26,11 +26,15 @@ public:
 	bool loadScene( char* fn );
 
 	bool sceneLoaded();
-
+	void traceThreshold(double value) {
+		threshold = value;
+	}
+	
 private:
 	unsigned char *buffer;
 	int buffer_width, buffer_height;
 	int bufferSize;
+	double threshold;
 	Scene *scene;
 
 	bool m_bSceneLoaded;

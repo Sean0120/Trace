@@ -72,7 +72,7 @@ Scene *readScene( istream& is )
 	}
 
 	buf[ ct ] = '\0';
-
+	//test whether the file is brgin with "SBT-raytracer"
 	if( strcmp( buf, "SBT-raytracer" ) ) {
 		throw ParseError( string( "Input is not an SBT input file." ) );
 	}
@@ -307,7 +307,9 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 		} else if( name == "box" ) {
 			obj = new Box( scene, mat );
 		} else if( name == "cylinder" ) {
-			obj = new Cylinder( scene, mat );
+			bool capped = true;
+			maybeExtractField(child, "capped", capped);
+			obj = new Cylinder( scene, mat, capped );
 		} else if( name == "cone" ) {
 			double height = 1.0;
 			double bottom_radius = 1.0;
@@ -532,7 +534,31 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 		scene->add( new PointLight( scene, 
 			tupleToVec( getField( child, "position" ) ),
 			tupleToVec( getColorField( child ) ) ) );
-	} else if( 	name == "sphere" ||
+		//for the three falloff
+		PointLight * point_light = dynamic_cast <PointLight *>(*(--scene->endLights()));
+		if (hasField(child,"constant_attenuation_coeff"))
+		{
+			point_light->set_constant_falloff(getField(child, "constant_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "linear_attenuation_coeff"))
+		{
+			point_light->set_linear_falloff(getField(child, "linear_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "quadratic_attenuation_coeff"))
+		{
+			point_light->set_quadratic_falloff(getField(child, "quadratic_attenuation_coeff")->getScalar());
+		}
+
+	} 
+	//for the ambient light
+	else if(name == "ambient_light"){
+		if (child == NULL) {
+			throw ParseError("No info for ambient light");
+		}
+		scene->set_ambient_light(tupleToVec(getColorField(child)));
+		
+	}
+	else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
 				name == "cone" ||
