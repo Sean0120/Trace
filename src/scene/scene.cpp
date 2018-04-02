@@ -69,7 +69,7 @@ bool BoundingBox::intersect(const ray& r, double& tMin, double& tMax) const
 
 		if (tMin > tMax) // box is missed
 			return false;
-		if (tMax < 0.0) // box is behind ray
+		if (tMax < RAY_EPSILON) // box is behind ray
 			return false;
 	}
 	return true; // it made it past all 3 axes.

@@ -28,9 +28,10 @@ public:
 
 	Fl_Slider*			m_sizeSlider;
 	Fl_Slider*			m_depthSlider;
-
+	Fl_Slider*			m_thresholdSlider;
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
+	
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -41,13 +42,13 @@ public:
 
 	int			getSize();
 	int			getDepth();
-
+	double		getThreshold();
 private:
 	RayTracer*	raytracer;
 
 	int			m_nSize;
 	int			m_nDepth;
-
+	double		m_nthreshold;
 	
 
 // static class members
@@ -64,6 +65,7 @@ private:
 
 	static void cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_depthSlides(Fl_Widget* o, void* v);
+	static void cb_thresholdSlides(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);
