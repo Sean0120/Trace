@@ -17,14 +17,19 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
     ray r( vec3f(0,0,0), vec3f(0,0,0) );
     scene->getCamera()->rayThrough( x,y,r );
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 0 ).clamp();
+	
+	index.push(1.0);
+	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 10 ).clamp();
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
 // (or places called from here) to handle reflection, refraction, etc etc.
 vec3f RayTracer::traceRay( Scene *scene, const ray& r, 
 	const vec3f& thresh, int depth )
-{
+{	
+	if (depth <= 0)
+		return vec3f(0, 0, 0); //terminate recursion
+
 	isect i;
 
 	if( scene->intersect( r, i ) ) {
@@ -38,9 +43,29 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// Instead of just returning the result of shade(), add some
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
-
+		double curI = index.top();
+		vec3f P = r.at(i.t);
 		const Material& m = i.getMaterial();
-		return m.shade(scene, r, i);
+		index.push(m.index);
+		vec3f I = m.shade(scene, r, i);
+		vec3f uL = -(r.getDirection().normalize());
+		vec3f uN = i.N.normalize();
+		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
+		ray reflected_ray(P, uR);
+		I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
+
+		double ratio = curI / m.index;
+		double cosi = uL.dot(uN);
+		bool total_reflect = (sqrt(1 - cosi * cosi)>= 1/ratio);
+		if (!total_reflect) {
+			double cost = sqrt(1 - ratio * ratio*(1 - cosi * cosi));
+			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
+			ray refracted_ray(P, uT);
+			I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
+		}
+
+		index.pop();
+		return I.clamp();
 	
 	} else {
 		// No intersection.  This ray travels to infinity, so we color

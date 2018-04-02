@@ -49,13 +49,16 @@ vec3f DirectionalLight::getDirection( const vec3f& P ) const
 double PointLight::distanceAttenuation( const vec3f& P ) const
 {
 	// YOUR CODE HERE
-
+	
 	// You'll need to modify this method to attenuate the intensity 
 	// of the light based on the distance between the source and the 
 	// point P.  For now, I assume no attenuation and just return 1.0
-	vec3f temp = position - P;
-	double value = temp.length_squared();
-	return 1 / (value*quadratic_falloff+ (position - P).length()*linear_falloff+ constant_falloff);
+
+	double atten = ((position - P).length_squared()*quadratic_falloff + (position - P).length()*linear_falloff + constant_falloff);
+	if (atten == RAY_EPSILON)
+		return 1;
+	return minimum(0.0,1 / atten);
+
 }
 
 vec3f PointLight::getColor( const vec3f& P ) const

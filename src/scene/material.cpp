@@ -36,5 +36,5 @@ vec3f Material::shade( Scene *scene, const ray& r, const isect& i ) const
 		vec3f atten = prod((*it)->getColor(P) ,(*it)->shadowAttenuation(P)*(*it)->distanceAttenuation(P));
 		I += prod(atten, (diffuse_term + spec_term));
 	}
-	return I;
+	return I.clamp();
 }
