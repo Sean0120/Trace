@@ -8,7 +8,8 @@
 #include "scene/ray.h"
 #include "fileio/read.h"
 #include "fileio/parse.h"
-
+#include"ui\TraceUI.h"
+extern TraceUI* traceUI;
 // Trace a top-level ray through normalized window coordinates (x,y)
 // through the projection plane, and out into the scene.  All we do is
 // enter the main ray-tracing method, getting things started by plugging
@@ -19,7 +20,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
     scene->getCamera()->rayThrough( x,y,r );
 	
 	index.push(1.0);
-	return traceRay( scene, r, vec3f(1.0,1.0,1.0), 10 ).clamp();
+	return traceRay( scene, r, vec3f(threshold, threshold, threshold)  , traceUI->getDepth()).clamp();
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -52,7 +53,11 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f uN = i.N.normalize();
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
 		ray reflected_ray(P, uR);
-		I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
+		double intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
+		double intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
+		double intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
+		if (intensity_0 > thresh[0] || intensity_1 > thresh[1]|| intensity_2 > thresh[2])
+			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 
 		double ratio = curI / m.index;
 		double cosi = uL.dot(uN);
@@ -61,7 +66,11 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			double cost = sqrt(1 - ratio * ratio*(1 - cosi * cosi));
 			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
 			ray refracted_ray(P, uT);
-			I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
+			intensity_0 = pow(m.kt[0], traceUI->getDepth() - depth);
+			intensity_1 = pow(m.kt[1], traceUI->getDepth() - depth);
+			intensity_2 = pow(m.kt[2], traceUI->getDepth() - depth);
+			if (intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2])
+				I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
 		}
 
 		index.pop();
