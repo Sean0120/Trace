@@ -549,7 +549,44 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			point_light->set_quadratic_falloff(getField(child, "quadratic_attenuation_coeff")->getScalar());
 		}
 
-	} 
+	}
+	//for spot light
+	else if (name == "spot_light") {
+		if (child == NULL) {
+			throw ParseError("No info for spot_light");
+		}
+
+		scene->add(new SpotLight(scene,
+			tupleToVec(getColorField(child)),
+			tupleToVec(getField(child, "position")),
+			tupleToVec(getField(child, "direction")).normalize()));
+
+		SpotLight * spot_light = dynamic_cast <SpotLight *>(*(--scene->endLights()));
+		if (hasField(child, "constant_attenuation_coeff"))
+		{
+			spot_light->set_constant_falloff(getField(child, "constant_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "linear_attenuation_coeff"))
+		{
+			spot_light->set_linear_falloff(getField(child, "linear_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "quadratic_attenuation_coeff"))
+		{
+			spot_light->set_quadratic_falloff(getField(child, "quadratic_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "coneAngle"))
+		{
+			spot_light->set_coneAngle(getField(child, "coneAngle")->getScalar());
+		}
+		if (hasField(child, "coneDeltaAngle"))
+		{
+			spot_light->set_coneDeltaAngle(getField(child, "coneDeltaAngle")->getScalar());
+		}
+		if (hasField(child, "beamDistribution"))
+		{
+			spot_light->set_beamDistribution(getField(child, "beamDistribution")->getScalar());
+		}
+	}
 	//for the ambient light
 	else if(name == "ambient_light"){
 		if (child == NULL) {

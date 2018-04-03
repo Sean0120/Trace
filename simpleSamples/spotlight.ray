@@ -1,0 +1,59 @@
+SBT-raytracer 1.0
+
+camera {
+	position = (0,0,-4);
+	viewdir = (0,0,1);
+	aspectratio = 1;
+	updir = (0,1,0);
+}
+
+spot_light {
+	position = (0, 0, -2.0);
+	colour = (1.0, 1.0, 1.0);
+	direction = (0, 0, 1.0);
+	coneAngle = 0.5236;
+	coneDeltaAngle = 0.2618;
+	beamDistribution = 1.0;
+}
+
+rotate(1,1,1,1,
+	scale(2,
+		translate(-0.5,-0.5,-0.5,
+			polymesh {
+				points = (
+					(0,0,0),
+					(0,1,0),
+					(1,1,0),
+					(1,0,0),
+
+					(0,0,1),
+					(0,1,1),
+					(1,1,1),
+					(1,0,1));
+				
+				faces = (
+					(0,1,2),
+					(0,2,3),
+
+					(6,5,4),
+					(7,6,4),
+
+					(3,2,6),
+					(3,6,7),
+
+					(4,5,1),
+					(4,1,0),
+
+					(1,5,2),
+					(5,6,2),
+
+					(4,0,3),
+					(4,3,7)
+					);
+				
+				material = { 
+					ambient = (0.0,0.0,0.0); 
+					diffuse = (0.1,0.1,1.0);
+					specular = (0.0,0.0,0.0) 
+				}
+			} )))
