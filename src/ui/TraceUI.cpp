@@ -107,7 +107,9 @@ void TraceUI::cb_linearAttenSlides(Fl_Widget* o, void* v) {
 void TraceUI::cb_quadraAttenSlides(Fl_Widget* o, void* v) {
 	((TraceUI*)(o->user_data()))->m_nquadraAtten = double(((Fl_Slider *)o)->value());
 }
-
+void TraceUI::cb_samplingSlides(Fl_Widget* o, void* v) {
+	((TraceUI*)(o->user_data()))->m_nSamplingSize = int(((Fl_Slider *)o)->value());
+}
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -264,8 +266,8 @@ TraceUI::TraceUI() {
 	m_nconstAtten = 0.5;
 	m_nlinearAtten = 0.2;
 	m_nquadraAtten = 0.0;
-
-	m_mainWindow = new Fl_Window(100, 40, 350, 200, "Ray <Not Loaded>");
+	m_nSamplingSize = 0;
+	m_mainWindow = new Fl_Window(100, 40, 350, 400, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
@@ -346,6 +348,20 @@ TraceUI::TraceUI() {
 		m_quadraAttenSlider->value(m_nquadraAtten);
 		m_quadraAttenSlider->align(FL_ALIGN_RIGHT);
 		m_quadraAttenSlider->callback(cb_quadraAttenSlides);
+
+		//quadratic attenuation
+		m_samplingSlider = new Fl_Value_Slider(10, 180, 200, 20, "Sampling Size");
+		m_samplingSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_samplingSlider->type(FL_HOR_NICE_SLIDER);
+		m_samplingSlider->labelfont(FL_COURIER);
+		m_samplingSlider->labelsize(12);
+		m_samplingSlider->minimum(0);
+		m_samplingSlider->maximum(5);
+		m_samplingSlider->step(1);
+		m_samplingSlider->value(m_nSamplingSize);
+		m_samplingSlider->align(FL_ALIGN_RIGHT);
+		m_samplingSlider->callback(cb_samplingSlides);
+
 
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
