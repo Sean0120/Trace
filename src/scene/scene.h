@@ -273,7 +273,7 @@ public:
 	Camera *getCamera() { return &camera; }
 
 	vec3f getAmbientLight() const;
-	
+	void acc_shadow_attenuation(const ray& r, vec3f &result);
 private:
     list<Geometry*> objects;
 	list<Geometry*> nonboundedobjects;

@@ -15,26 +15,26 @@ vec3f DirectionalLight::shadowAttenuation( const vec3f& P ) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
+	vec3f intensity = vec3f(1, 1, 1);
 	ray r(P, this->getDirection(P));
-	isect i;
-	vec3f intensity = vec3f(1,1,1);
-	bool isShadow = false;
-	while (this->getScene()->intersect(r, i) == true) {
-		if (i.getMaterial().kt.iszero()) {
-			isShadow = true;
-			break;
-		}
-		else {
-			vec3f tmpP = r.at(i.t);
-			ray tmpR(tmpP, this->getDirection(P));
-			r = tmpR;
-			intensity = prod(intensity, i.getMaterial().kt);
-		}
-	}
-	if (isShadow)
-		return vec3f(0, 0, 0);
-	else
-		return intensity;
+	this->getScene()->acc_shadow_attenuation(r, intensity);
+	//bool isShadow = false;
+	//while(this->getScene()->intersect(r, i) == true){
+	//	if (i.getMaterial().kt.iszero()) {
+	//		isShadow = true;
+	//		break;
+	//	}
+	//	else {
+	//		vec3f tmpP = r.at(i.t);
+	//		ray tmpR(tmpP, this->getDirection(P));
+	//		r = tmpR;
+	//		intensity = prod(intensity, i.getMaterial().kt);
+	//	}
+	//}
+	//if (isShadow)
+	//	return vec3f(0, 0, 0);
+	//else
+	return intensity;
 }
 
 vec3f DirectionalLight::getColor( const vec3f& P ) const
@@ -81,24 +81,24 @@ vec3f PointLight::shadowAttenuation(const vec3f& P) const
 {
     // YOUR CODE HERE:
     // You should implement shadow-handling code here.
-	isect i;
 	vec3f intensity = vec3f(1,1,1);
 	ray r(P, this->getDirection(P));
-	bool isShadow = false;
-	while(this->getScene()->intersect(r, i) == true){
-		if (i.getMaterial().kt.iszero()) {
-			isShadow = true;
-			break;
-		}
-		else {
-			vec3f tmpP = r.at(i.t);
-			ray tmpR(tmpP, this->getDirection(P));
-			r = tmpR;
-			intensity = prod(intensity, i.getMaterial().kt);
-		}
-	}
-	if (isShadow)
-		return vec3f(0, 0, 0);
-	else
-		return intensity;
+	this->getScene()->acc_shadow_attenuation(r, intensity);
+	//bool isShadow = false;
+	//while(this->getScene()->intersect(r, i) == true){
+	//	if (i.getMaterial().kt.iszero()) {
+	//		isShadow = true;
+	//		break;
+	//	}
+	//	else {
+	//		vec3f tmpP = r.at(i.t);
+	//		ray tmpR(tmpP, this->getDirection(P));
+	//		r = tmpR;
+	//		intensity = prod(intensity, i.getMaterial().kt);
+	//	}
+	//}
+	//if (isShadow)
+	//	return vec3f(0, 0, 0);
+	//else
+	return intensity;
 }

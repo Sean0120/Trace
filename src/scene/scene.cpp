@@ -207,3 +207,31 @@ vec3f Scene::getAmbientLight() const {
 	return ambient_light;
 }
 
+void Scene::acc_shadow_attenuation(const ray& r, vec3f& result) {
+	typedef list<Geometry*>::const_iterator iter;
+	iter j;
+	isect cur;
+
+	// try the non-bounded objects
+	for (j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j) {
+		if ((*j)->intersect(r, cur)) {
+			result = prod(result, cur.getMaterial().kt);
+			if (cur.getMaterial().kt.iszero())
+			{
+				return;
+			}
+		}
+	}
+
+	// try the bounded objects
+	for (j = boundedobjects.begin(); j != boundedobjects.end(); ++j) {
+		if ((*j)->intersect(r, cur)) {
+			result = prod(result, cur.getMaterial().kt);
+			if (cur.getMaterial().kt.iszero())
+			{
+				return;
+			}
+		}
+	}
+
+}
