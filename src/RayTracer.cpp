@@ -123,7 +123,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
 
-		bool get_out = (abs(curI - m.index) < RAY_EPSILON);	//check get out or in
+		//bool get_out = (abs(curI - m.index) < RAY_EPSILON);	//check get out or in
 		vec3f uN = i.N.normalize();
 		vec3f I = m.shade(scene, r, i);
 		
@@ -139,7 +139,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 		index.pop();
 
-
+		bool get_out = (uL.dot(uN) < 0);
 		if (get_out) {
 			uN = -uN;
 			index.push(1.0);
@@ -160,6 +160,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2])&&!m.kt.iszero())
 				I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
 
+		}
+		else {
+			intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
+			intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
+			intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
+			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2]) && !m.kr.iszero())
+				I = I + prod(vec3f(1,1,1)-m.kr, traceRay(scene, reflected_ray, thresh, depth - 1));
 		}
 		index.pop();
 
