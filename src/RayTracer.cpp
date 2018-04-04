@@ -9,6 +9,7 @@
 #include "fileio/read.h"
 #include "fileio/parse.h"
 #include"ui\TraceUI.h"
+#include "fileio\bitmap.h"
 #include<cstdlib>
 #include<ctime>
 extern TraceUI* traceUI;
@@ -131,6 +132,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
+		if(background_loaded)
 
 		return vec3f( 0.0, 0.0, 0.0 );
 	}
@@ -142,6 +144,9 @@ RayTracer::RayTracer()
 	buffer_width = buffer_height = 256;
 	scene = NULL;
 
+	background = NULL;
+	background_loaded = false;
+
 	m_bSceneLoaded = false;
 }
 
@@ -150,6 +155,8 @@ RayTracer::~RayTracer()
 {
 	delete [] buffer;
 	delete scene;
+
+	if (background) delete[] background;
 }
 
 void RayTracer::getBuffer( unsigned char *&buf, int &w, int &h )
@@ -198,6 +205,45 @@ bool RayTracer::loadScene( char* fn )
 	m_bSceneLoaded = true;
 
 	return true;
+}
+
+bool RayTracer::loadBackground(char* fn) {
+	unsigned char* data;
+	int width, height;
+
+	if ((data = readBMP(fn, width, height)) == NULL) {
+		fl_alert("Can't load bitmap file");
+		background_loaded = false;
+		return false;
+	}
+
+	// reflect the fact of loading the new image
+	background_width = width;
+	background_height = height;
+
+	//delete old
+	if (background) delete[] background;
+	background = data;
+
+	background_loaded = true;
+	return true;
+}
+
+vec3f RayTracer::getBackgroundPixel(int x, int y) {
+	if (x < 0)
+		x = 0;
+	else if (x >= background_width)
+		x = background_width - 1;
+	if (y < 0)
+		y = 0;
+	else if (y >= background_height)
+		y = background_height - 1;
+
+	double r = ((double)(*(background + 3 * (y*background_width + x)))) / 256.0;
+	double g = ((double)(*(background + 3 * (y*background_width + x)+1))) / 256.0;
+	double b = ((double)(*(background + 3 * (y*background_width + x)+2))) / 256.0;
+	
+	return vec3f(r, g, b);
 }
 
 void RayTracer::traceSetup( int w, int h )

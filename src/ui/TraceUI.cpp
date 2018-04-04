@@ -41,6 +41,26 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 	}
 }
 
+void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
+{
+	TraceUI* pUI = whoami(o);
+
+	char* newfile = fl_file_chooser("Open Background?", "*.bmp", NULL);
+
+	if (newfile != NULL) {
+		char buf[256];
+
+		if (pUI->raytracer->loadBackground(newfile)) {
+			sprintf(buf, "Ray <%s>", newfile);
+		}
+		else {
+			sprintf(buf, "Ray <Not loaded>");
+		}
+
+		pUI->m_mainWindow->label(buf);
+	}
+}
+
 void TraceUI::cb_save_image(Fl_Menu_* o, void* v) 
 {
 	TraceUI* pUI=whoami(o);
@@ -247,6 +267,7 @@ void TraceUI::setQuadraAttenuation(double value) {
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
+		{ "&Load Background...", FL_ALT+'b', (Fl_Callback *)TraceUI::cb_load_background },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
