@@ -19,35 +19,80 @@ extern TraceUI* traceUI;
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
 	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));
-		
-	if (traceUI->m_nSamplingSize == 0) {
-		scene->getCamera()->rayThrough(x, y, r);
-		index = stack<double>();
-		index.push(1.0);
-		return traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+	if (traceUI->m_nAdaptive == FALSE) {
+		if (traceUI->m_nSamplingSize == 0) {
+			scene->getCamera()->rayThrough(x, y, r);
+			index = stack<double>();
+			index.push(1.0);
+			return traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+		}
+		else
+		{
+			int samplesize = traceUI->m_nSamplingSize;
+			vec3f sum(0, 0, 0);
+			for (int i = 0; i < samplesize; i++) {
+				for (int j = 0; j < samplesize; j++) {
+					double rx = double(rand() % 10000) / 10000 - 0.5;
+					double ry = double(rand() % 10000) / 10000 - 0.5;
+					//cout << rx << " " << ry << endl;
+					//scene->getCamera()->rayThrough(x, y, r);
+					scene->getCamera()->rayThrough(x + (rx - double(samplesize-1) / 2 + i) / buffer_width, y + (ry - double(samplesize-1) / 2 + j) / buffer_height, r);
+					index = stack<double>();
+					index.push(1.0);
+
+					sum += traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+
+				}
+			}
+			sum = sum / (samplesize*samplesize);
+			return sum;
+		}
 	}
 	else
 	{
-		int samplesize = traceUI->m_nSamplingSize;
+		return AdaptiveSampling(scene,0, x, y);
+	}
+}
 
-		
-		vec3f sum(0,0,0);
-		for (int i = 0; i < samplesize; i++) {
-			for (int j = 0; j < samplesize; j++) {
-				double rx = double(rand()%10000)  /10000-0.5;
-				double ry = double(rand()%10000)  /10000-0.5; 
-				//cout << rx << " " << ry << endl;
-				//scene->getCamera()->rayThrough(x, y, r);
-				scene->getCamera()->rayThrough(x +(rx -samplesize/2 +i)/buffer_width, y+(ry - samplesize / 2 +j)/buffer_height, r);
-				index = stack<double>();
-				index.push(1.0);
-
-				sum += traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
-
+//do recursive for adaptive sampling
+vec3f RayTracer::AdaptiveSampling(Scene *scene,int depth, double x, double y) {
+	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));	
+	vec3f sum(0, 0, 0);
+	vec3f ray4[4];
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			scene->getCamera()->rayThrough(x + ( i- 0.5 ) / buffer_width/ pow(3,depth), y + (j- 0.5 ) / buffer_height / pow(3, depth), r);
+			index = stack<double>();
+			index.push(1.0);
+			ray4[2*i+j]= traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+			sum += ray4[2 * i + j];
+		}
+	}
+	sum = sum / (2*2);
+	double error = 0; 
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++) {
+			error += fabsf(sum[i] - ray4[j][i]);
+		}
+	}
+	if (error < 0.1)
+	{
+		return sum;
+	}
+	else if (depth == 2) {
+		return sum;
+	}
+	else
+	{
+		++depth;
+		vec3f sum(0, 0, 0);
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				sum += AdaptiveSampling(scene, depth , x +(i-1)/pow(3,depth) / buffer_width, y + (j - 1) / pow(3, depth) / buffer_height);
 			}
 		}
-		sum = sum / (samplesize*samplesize);
-		return sum;
+		return sum/9;
+
 	}
 }
 

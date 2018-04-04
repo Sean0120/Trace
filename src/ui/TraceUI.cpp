@@ -110,6 +110,10 @@ void TraceUI::cb_quadraAttenSlides(Fl_Widget* o, void* v) {
 void TraceUI::cb_samplingSlides(Fl_Widget* o, void* v) {
 	((TraceUI*)(o->user_data()))->m_nSamplingSize = int(((Fl_Slider *)o)->value());
 }
+void TraceUI::cb_adaptive(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nAdaptive = !((TraceUI*)(o->user_data()))->m_nAdaptive;
+}
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -267,7 +271,8 @@ TraceUI::TraceUI() {
 	m_nlinearAtten = 0.2;
 	m_nquadraAtten = 0.0;
 	m_nSamplingSize = 0;
-	m_mainWindow = new Fl_Window(100, 40, 350, 400, "Ray <Not Loaded>");
+	m_nAdaptive = FALSE;
+	m_mainWindow = new Fl_Window(100, 40, 400, 400, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
@@ -362,8 +367,10 @@ TraceUI::TraceUI() {
 		m_samplingSlider->align(FL_ALIGN_RIGHT);
 		m_samplingSlider->callback(cb_samplingSlides);
 
-
-
+		m_adapativeSampling = new Fl_Light_Button(280, 180, 80, 20, "Adaptive");
+		m_adapativeSampling->user_data((void*)(this));
+		m_adapativeSampling->callback(cb_adaptive);
+	
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
 		m_renderButton->callback(cb_render);

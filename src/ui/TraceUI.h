@@ -13,7 +13,7 @@
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
-
+#include <FL/Fl_Light_Button.H>
 #include <FL/fl_file_chooser.H>		// FLTK file chooser
 
 #include "TraceGLWindow.h"
@@ -35,6 +35,8 @@ public:
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
 	Fl_Slider*			m_samplingSlider;
+	Fl_Light_Button*    m_adapativeSampling;
+
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -51,7 +53,7 @@ public:
 	void		setConstAttenuation(double value);
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
-
+	bool		m_nAdaptive;
 	int			m_nSamplingSize;
 private:
 	RayTracer*	raytracer;
@@ -83,7 +85,7 @@ private:
 	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
 	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
 	static void cb_samplingSlides(Fl_Widget* o, void* v);
-
+	static void cb_adaptive(Fl_Widget* o, void* v);
 
 
 	static void cb_render(Fl_Widget* o, void* v);
