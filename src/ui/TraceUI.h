@@ -34,7 +34,7 @@ public:
 	Fl_Slider*			m_constAttenSlider;
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
-
+	Fl_Slider*			m_samplingSlider;
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -52,6 +52,7 @@ public:
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
 
+	int			m_nSamplingSize;
 private:
 	RayTracer*	raytracer;
 
@@ -81,6 +82,9 @@ private:
 	static void cb_constAttenSlides(Fl_Widget* o, void* v);
 	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
 	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
+	static void cb_samplingSlides(Fl_Widget* o, void* v);
+
+
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

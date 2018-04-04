@@ -587,6 +587,62 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 			spot_light->set_beamDistribution(getField(child, "beamDistribution")->getScalar());
 		}
 	}
+	//for warn model
+	else if (name == "warn_light") {
+		if (child == NULL) {
+			throw ParseError("No info for warn light");
+		}
+		scene->add(new WarnLight(scene,
+			tupleToVec(getColorField(child)),
+			tupleToVec(getField(child, "position")),
+			tupleToVec(getField(child, "direction")).normalize()));
+
+		WarnLight * warn_light = dynamic_cast <WarnLight *>(*(--scene->endLights()));
+		if (hasField(child, "constant_attenuation_coeff"))
+		{
+			warn_light->set_constant_falloff(getField(child, "constant_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "linear_attenuation_coeff"))
+		{
+			warn_light->set_linear_falloff(getField(child, "linear_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "quadratic_attenuation_coeff"))
+		{
+			warn_light->set_quadratic_falloff(getField(child, "quadratic_attenuation_coeff")->getScalar());
+		}
+		if (hasField(child, "coneAngle"))
+		{
+			warn_light->set_coneAngle(getField(child, "coneAngle")->getScalar());
+		}
+		if (hasField(child, "p"))
+		{
+			warn_light->set_p_factor(getField(child, "p")->getScalar());
+		}
+		if (hasField(child, "x_min"))
+		{
+			warn_light->set_min(getField(child, "x_min")->getScalar(), 'x');
+		}
+		if (hasField(child, "y_min"))
+		{
+			warn_light->set_min(getField(child, "y_min")->getScalar(), 'y');
+		}
+		if (hasField(child, "z_min"))
+		{
+			warn_light->set_min(getField(child, "z_min")->getScalar(), 'z');
+		}
+		if (hasField(child, "x_max"))
+		{
+			warn_light->set_max(getField(child, "x_max")->getScalar(), 'x');
+		}
+		if (hasField(child, "y_max"))
+		{
+			warn_light->set_max(getField(child, "y_max")->getScalar(), 'y');
+		}
+		if (hasField(child, "z_max"))
+		{
+			warn_light->set_max(getField(child, "z_max")->getScalar(), 'z');
+		}
+	}
 	//for the ambient light
 	else if(name == "ambient_light"){
 		if (child == NULL) {

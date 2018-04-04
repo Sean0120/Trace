@@ -9,6 +9,8 @@
 #include "fileio/read.h"
 #include "fileio/parse.h"
 #include"ui\TraceUI.h"
+#include<cstdlib>
+#include<ctime>
 extern TraceUI* traceUI;
 // Trace a top-level ray through normalized window coordinates (x,y)
 // through the projection plane, and out into the scene.  All we do is
@@ -16,13 +18,37 @@ extern TraceUI* traceUI;
 // in an initial ray weight of (0.0,0.0,0.0) and an initial recursion depth of 0.
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
-    ray r( vec3f(0,0,0), vec3f(0,0,0) );
-    scene->getCamera()->rayThrough( x,y,r );
-	index = stack<double>();
-	index.push(1.0);
+	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));
+		
+	if (traceUI->m_nSamplingSize == 0) {
+		scene->getCamera()->rayThrough(x, y, r);
+		index = stack<double>();
+		index.push(1.0);
+		return traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+	}
+	else
+	{
+		int samplesize = traceUI->m_nSamplingSize;
 
-	return traceRay( scene, r, vec3f(threshold, threshold, threshold)  , traceUI->getDepth()).clamp();
+		
+		vec3f sum(0,0,0);
+		for (int i = 0; i < samplesize; i++) {
+			for (int j = 0; j < samplesize; j++) {
+				double rx = double(rand()%10000)  /10000-0.5;
+				double ry = double(rand()%10000)  /10000-0.5; 
+				//cout << rx << " " << ry << endl;
+				//scene->getCamera()->rayThrough(x, y, r);
+				scene->getCamera()->rayThrough(x +(rx -samplesize/2 +i)/buffer_width, y+(ry - samplesize / 2 +j)/buffer_height, r);
+				index = stack<double>();
+				index.push(1.0);
 
+				sum += traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+
+			}
+		}
+		sum = sum / (samplesize*samplesize);
+		return sum;
+	}
 }
 
 // Do recursive ray tracing!  You'll want to insert a lot of code here
@@ -52,7 +78,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
 
-		bool get_out = (abs(curI - m.index) < RAY_EPSILON);	//check get out or in
+		//bool get_out = (abs(curI - m.index) < RAY_EPSILON);	//check get out or in
 		vec3f uN = i.N.normalize();
 		vec3f I = m.shade(scene, r, i);
 		
@@ -68,7 +94,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 		index.pop();
 
-
+		bool get_out = (uL.dot(uN) < 0);
 		if (get_out) {
 			uN = -uN;
 			index.push(1.0);
@@ -89,6 +115,13 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2])&&!m.kt.iszero())
 				I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
 
+		}
+		else {
+			intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
+			intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
+			intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
+			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2]) && !m.kr.iszero())
+				I = I + prod(vec3f(1,1,1)-m.kr, traceRay(scene, reflected_ray, thresh, depth - 1));
 		}
 		index.pop();
 
