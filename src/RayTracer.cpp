@@ -117,21 +117,21 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// Instead of just returning the result of shade(), add some
 		// more steps: add in the contributions from reflected and refracted
 		// rays.
-		double curI = index.top();
-		vec3f P = r.at(i.t);
+		double curI = index.top();	//index of current material
+		vec3f P = r.at(i.t);	//intersection point
 		const Material& m = i.getMaterial();
-		if (depth <= 0)
+		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
 
-		index.push(curI);
-		bool get_out = (abs(curI - m.index) < RAY_EPSILON);
+		bool get_out = (abs(curI - m.index) < RAY_EPSILON);	//check get out or in
 		vec3f uN = i.N.normalize();
 		vec3f I = m.shade(scene, r, i);
+		
+		index.push(curI);		
 		vec3f uL = -(r.getDirection().normalize());
 		//vec3f uN = i.N.normalize();
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
 		ray reflected_ray(P, uR);
-
 		double intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
 		double intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
 		double intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
