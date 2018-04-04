@@ -132,6 +132,17 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
+		if (background_loaded) {
+			//vec3f d = r.getDirection();
+			//vec3f p = r.getPosition();
+			vec3f x = scene->getCamera()->getU();
+			vec3f y = scene->getCamera()->getV();
+			vec3f z = scene->getCamera()->getLook();
+			double dis_x = r.getDirection().dot(x);
+			double dis_y = r.getDirection().dot(y);
+			double dis_z = r.getDirection().dot(z);
+			return getBackgroundPixel(background_width*(dis_x / dis_z + 0.5), (dis_y / dis_z + 0.5)*background_height);
+		}
 
 		return vec3f( 0.0, 0.0, 0.0 );
 	}
