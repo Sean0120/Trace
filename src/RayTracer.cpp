@@ -132,7 +132,6 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
-		if(background_loaded)
 
 		return vec3f( 0.0, 0.0, 0.0 );
 	}
