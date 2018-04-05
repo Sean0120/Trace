@@ -175,8 +175,11 @@ bool Scene::intersect( const ray& r, isect& i ) const
 	bool have_one = false;
 	
 	double tMax, tMin;
-	if (BVH_Root == NULL||BVH_Root->box.intersect(r, tMin, tMax) == false)
+	if (BVH_Root == NULL || BVH_Root->box.intersect(r, tMin, tMax) == false) {
+		//std::cout << "false" << std::endl;
 		return false;
+	}
+
 
 	stack<BVH_Node*> node;
 	double tMaxl, tMinl, tMaxr, tMinr;
@@ -187,11 +190,14 @@ bool Scene::intersect( const ray& r, isect& i ) const
 		if (!curN->isLeaf) {
 			bool li = false;
 			bool ri = false;
-			if(curN->left!=NULL)
+			if (curN->left != NULL){
 				li = curN->left->box.intersect(r, tMinl, tMaxl);
-			if(curN->right != NULL)
+			}
+			if (curN->right != NULL) {
 				ri = curN->right->box.intersect(r, tMinr, tMaxr);
+			}
 			if (li&&ri) {
+				
 				if (tMinl - RAY_EPSILON <= tMinr) {
 					node.push(curN->right);
 					curN = curN->left;
@@ -205,8 +211,10 @@ bool Scene::intersect( const ray& r, isect& i ) const
 			}
 			else if (li == true) {
 				curN = curN->left;
+				continue;
 			}else if (ri == true) {
 				curN = curN->right;
+				continue;
 			}
 		}
 		else {
@@ -216,6 +224,9 @@ bool Scene::intersect( const ray& r, isect& i ) const
 					have_one = true;
 				}
 			}
+		}
+		if (node.empty()) {
+			return have_one;
 		}
 		while (!node.empty()) {
 			BVH_Node* check = node.top();
@@ -227,7 +238,6 @@ bool Scene::intersect( const ray& r, isect& i ) const
 				}
 			if (node.empty()) {
 				return have_one;
-
 			}
 		}
 	}
