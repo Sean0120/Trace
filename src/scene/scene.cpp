@@ -192,9 +192,11 @@ bool Scene::intersect( const ray& r, isect& i ) const
 			bool ri = false;
 			if (curN->left != NULL){
 				li = curN->left->box.intersect(r, tMinl, tMaxl);
+				tMinl = (tMinl < 0.0 ? tMaxl : tMinl);
 			}
 			if (curN->right != NULL) {
 				ri = curN->right->box.intersect(r, tMinr, tMaxr);
+				tMinr = (tMinr < 0.0 ? tMaxr : tMinr);
 			}
 			if (li&&ri) {
 				
@@ -232,6 +234,7 @@ bool Scene::intersect( const ray& r, isect& i ) const
 			BVH_Node* check = node.top();
 			node.pop();
 			if (check->box.intersect(r, tMin, tMax))
+				tMin = (tMin < 0.0 ? tMax : tMin);
 				if (tMin - RAY_EPSILON < i.t){
 					curN = check;
 					break;
