@@ -11,6 +11,7 @@
 
 #include "TraceUI.h"
 #include "../RayTracer.h"
+#include "../fileio/bitmap.h"
 
 static bool done;
 
@@ -38,6 +39,24 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 		}
 
 		pUI->m_mainWindow->label(buf);
+	}
+}
+
+void TraceUI::cb_load_texture(Fl_Menu_* o, void* v) {
+	TraceUI* pUI = whoami(o);
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", NULL);
+	if (newfile != NULL) {
+		unsigned char*	data;
+		int				width,height;
+
+		if ((data = readBMP(newfile, width, height)) == NULL)
+		{
+			fl_alert("Can't load bitmap file");
+			return ;
+		}
+		pUI->raytracer->scene->m_ucBitmap = data;
+		pUI->raytracer->scene->m_nTextureHeight = height;
+		pUI->raytracer->scene->m_nTextureWidth = width;
 	}
 }
 
@@ -114,6 +133,11 @@ void TraceUI::cb_adaptive(Fl_Widget* o, void* v) {
 
 	((TraceUI*)(o->user_data()))->m_nAdaptive = !((TraceUI*)(o->user_data()))->m_nAdaptive;
 }
+void TraceUI::cb_texture(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nTexture = !((TraceUI*)(o->user_data()))->m_nTexture;
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -252,6 +276,7 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
+		{ "&Load Texture",	FL_ALT + 't', (Fl_Callback *)TraceUI::cb_load_texture },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 
@@ -272,6 +297,7 @@ TraceUI::TraceUI() {
 	m_nquadraAtten = 0.0;
 	m_nSamplingSize = 0;
 	m_nAdaptive = FALSE;
+	m_nTexture = FALSE;
 	m_mainWindow = new Fl_Window(100, 40, 400, 400, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -371,6 +397,11 @@ TraceUI::TraceUI() {
 		m_adapativeSampling->user_data((void*)(this));
 		m_adapativeSampling->callback(cb_adaptive);
 	
+		m_textureMapping = new Fl_Light_Button(10, 205, 80, 20, "texture");
+		m_textureMapping->user_data((void*)(this));
+		m_textureMapping->callback(cb_texture);
+
+
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
 		m_renderButton->callback(cb_render);

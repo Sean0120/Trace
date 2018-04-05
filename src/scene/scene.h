@@ -6,7 +6,7 @@
 
 #ifndef __SCENE_H__
 #define __SCENE_H__
-
+#define M_PI 3.14159265358979
 #include <list>
 #include <algorithm>
 
@@ -143,6 +143,7 @@ public:
     // intersections performed in the object's local coordinate space
     // do not call directly - this should only be called by intersect()
 	virtual bool intersectLocal( const ray& r, isect& i ) const;
+	virtual void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {};
 
 
 	virtual bool hasBoundingBoxCapability() const;
@@ -274,6 +275,9 @@ public:
 
 	vec3f getAmbientLight() const;
 	void acc_shadow_attenuation(const ray& r, vec3f &result);
+	unsigned char*	m_ucBitmap;
+	int			m_nTextureWidth;
+	int			m_nTextureHeight;
 private:
     list<Geometry*> objects;
 	list<Geometry*> nonboundedobjects;

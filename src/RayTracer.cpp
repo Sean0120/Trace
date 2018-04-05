@@ -119,6 +119,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// rays.
 		double curI = index.top();	//index of current material
 		vec3f P = r.at(i.t);	//intersection point
+		//cout << P << endl;
 		const Material& m = i.getMaterial();
 		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
