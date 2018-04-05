@@ -266,8 +266,12 @@ void Scene::initScene()
 	}
 
 	BVH_Root = new BVH_Node(sceneBounds);
+	BVH_size = 1;
 	buildBVH(BVH_Root, obj);
 
+	std::cout << obj.size() << std::endl;
+	std::cout << BVH_size << std::endl;
+	std::cout << getBVHSize(BVH_Root) << std::endl;
 }
 
 vec3f Scene::getAmbientLight() const {
@@ -309,13 +313,13 @@ void Scene::buildBVH(BVH_Node* root, vector<Geometry*> objects) {
 		return;
 	}
 	else if (objects.size() == 1) {
-		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]);
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]); BVH_size++;
 		root->right = NULL;
 		return;
 	}
 	else if (objects.size() == 2) {
-		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]);
-		root->right = new BVH_Node(objects[1]->getBoundingBox(), objects[1]);
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]); BVH_size++;
+		root->right = new BVH_Node(objects[1]->getBoundingBox(), objects[1]); BVH_size++;
 		return;
 	}
 
@@ -334,8 +338,14 @@ void Scene::buildBVH(BVH_Node* root, vector<Geometry*> objects) {
 		rb.min = minimum(rb.min, (objects[i]->getBoundingBox()).min);
 		rv.push_back(objects[i]);
 	}
-	root->left = new BVH_Node(lb);
-	root->right = new BVH_Node(rb);
+	root->left = new BVH_Node(lb); BVH_size++;
+	root->right = new BVH_Node(rb); BVH_size++;
 	buildBVH(root->left, lv);
 	buildBVH(root->right, rv);
+}
+int Scene::getBVHSize(BVH_Node* r) {
+	if (r == NULL)
+		return 0;
+	else
+		return 1 + getBVHSize(r->left) + getBVHSize(r->right);
 }

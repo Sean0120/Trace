@@ -275,7 +275,8 @@ public:
 
 	vec3f getAmbientLight() const;
 	void acc_shadow_attenuation(const ray& r, vec3f &result);
-
+	int getBVHSize(BVH_Node* r);
+	void buildBVH(BVH_Node* root, vector<Geometry*> objects);
 	
 private:
     list<Geometry*> objects;
@@ -293,7 +294,8 @@ private:
 
 	// bvh tree
 	BVH_Node* BVH_Root;
-	void buildBVH(BVH_Node* root, vector<Geometry*> objects);
+	int BVH_size;
+	
 };
 
 class BVH_Node {
@@ -301,7 +303,7 @@ public:
 	
 	BVH_Node() { left = right = NULL; isLeaf = false; obj = NULL; }
 	BVH_Node(BoundingBox b, bool is = false) { box = b; left = right = NULL; isLeaf = is; obj = NULL; }		//used only for internal nodes
-	BVH_Node(BoundingBox b, Geometry* g, bool is = true) { box = b; obj = g; isLeaf = is; }		//used only for leaf nodes
+	BVH_Node(BoundingBox b, Geometry* g, bool is = true) { box = b; obj = g; isLeaf = is; left = right = NULL; }		//used only for leaf nodes
 	Geometry* obj;
 	BoundingBox box;
 	BVH_Node* left;
