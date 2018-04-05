@@ -292,6 +292,7 @@ private:
 	BoundingBox sceneBounds;
 
 	// bvh tree
+	BVH_Node* BVH_Root;
 	void buildBVH(BVH_Node* root, vector<Geometry*> objects);
 };
 

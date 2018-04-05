@@ -178,6 +178,7 @@ void Scene::initScene()
 {
 	bool first_boundedobject = true;
 	BoundingBox b;
+	vector<Geometry*> obj;
 	
 	typedef list<Geometry*>::const_iterator iter;
 	// split the objects into two categories: bounded and non-bounded
@@ -185,6 +186,7 @@ void Scene::initScene()
 		if( (*j)->hasBoundingBoxCapability() )
 		{
 			boundedobjects.push_back(*j);
+			obj.push_back(*j);
 
 			(*j)->ComputeBoundingBox();//compute boundingbox for each objects
 
@@ -204,6 +206,8 @@ void Scene::initScene()
 			nonboundedobjects.push_back(*j);
 	}
 
+	BVH_Root = new BVH_Node(sceneBounds);
+	buildBVH(BVH_Root, obj);
 
 }
 
@@ -262,13 +266,13 @@ void Scene::buildBVH(BVH_Node* root, vector<Geometry*> objects) {
 	BoundingBox lb;
 	BoundingBox rb;
 	for (int i = 0; i < div; i++) {
-		lb.max = maximum(lb.max, (objects[i]->getBoundingBox).max);
-		lb.min = minimum(lb.min, (objects[i]->getBoundingBox).min);
+		lb.max = maximum(lb.max, (objects[i]->getBoundingBox()).max);
+		lb.min = minimum(lb.min, (objects[i]->getBoundingBox()).min);
 		lv.push_back(objects[i]);
 	}
 	for (int i = div; i < objects.size(); i++) {
-		rb.max = maximum(rb.max, (objects[i]->getBoundingBox).max);
-		rb.min = minimum(rb.min, (objects[i]->getBoundingBox).min);
+		rb.max = maximum(rb.max, (objects[i]->getBoundingBox()).max);
+		rb.min = minimum(rb.min, (objects[i]->getBoundingBox()).min);
 		rv.push_back(objects[i]);
 	}
 	root->left = new BVH_Node(lb);
