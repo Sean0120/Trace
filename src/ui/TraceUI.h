@@ -74,6 +74,7 @@ private:
 	static TraceUI* whoami(Fl_Menu_* o);
 
 	static void cb_load_scene(Fl_Menu_* o, void* v);
+	static void cb_load_background(Fl_Menu_* o, void* v);
 	static void cb_save_image(Fl_Menu_* o, void* v);
 	static void cb_load_texture(Fl_Menu_* o, void* v);
 

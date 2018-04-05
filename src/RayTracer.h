@@ -15,7 +15,9 @@ public:
 
     vec3f trace( Scene *scene, double x, double y );
 	vec3f traceRay( Scene *scene, const ray& r, const vec3f& thresh, int depth );
-
+	//for background
+	bool loadBackground(char* fn);
+	vec3f getBackgroundPixel(int x, int y);
 
 	void getBuffer( unsigned char *&buf, int &w, int &h );
 	double aspectRatio();
@@ -41,6 +43,12 @@ private:
 	bool m_bSceneLoaded;
 
 	stack<double> index;
+
+	//for background
+	bool background_loaded;
+	unsigned char* background;
+	int background_width;
+	int background_height;
 };
 
 #endif // __RAYTRACER_H__

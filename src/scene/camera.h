@@ -14,6 +14,10 @@ public:
     void setFOV( double );
     void setAspectRatio( double );
 
+	vec3f getU() { return u; }
+	vec3f getV() { return v; }
+	vec3f getLook() { return look; }
+
     double getAspectRatio() { return aspectRatio; }
 private:
     mat3f m;                     // rotation matrix
