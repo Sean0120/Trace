@@ -144,7 +144,7 @@ Scene::~Scene()
 // intersection through the reference parameter.
 bool Scene::intersect( const ray& r, isect& i ) const
 {
-	typedef list<Geometry*>::const_iterator iter;
+	/*typedef list<Geometry*>::const_iterator iter;
 	iter j;
 
 	isect cur;
@@ -171,7 +171,66 @@ bool Scene::intersect( const ray& r, isect& i ) const
 	}
 
 
-	return have_one;
+	return have_one;*/
+	bool have_one = false;
+	
+	double tMax, tMin;
+	if (BVH_Root == NULL||BVH_Root->box.intersect(r, tMin, tMax) == false)
+		return false;
+
+	stack<BVH_Node*> node;
+	double tMaxl, tMinl, tMaxr, tMinr;
+	double minT= 1.0e308;
+	isect curI;
+	BVH_Node* curN = BVH_Root;
+	while (true) {
+		if (!curN->isLeaf) {
+			bool li = false;
+			bool ri = false;
+			if(curN->left!=NULL)
+				li = curN->left->box.intersect(r, tMinl, tMaxl);
+			if(curN->right != NULL)
+				ri = curN->right->box.intersect(r, tMinr, tMaxr);
+			if (li&&ri) {
+				if (tMinl - RAY_EPSILON <= tMinr) {
+					node.push(curN->right);
+					curN = curN->left;
+					continue;
+				}
+				else {
+					node.push(curN->left);
+					curN = curN->right;
+					continue;
+				}
+			}
+			else if (li == true) {
+				curN = curN->left;
+			}else if (ri == true) {
+				curN = curN->right;
+			}
+		}
+		else {
+			if (curN->obj->intersect(r, curI)) {
+				if (have_one != true||curI.t - RAY_EPSILON <= i.t) {
+					i = curI;
+					have_one = true;
+				}
+			}
+		}
+		while (!node.empty()) {
+			BVH_Node* check = node.top();
+			node.pop();
+			if (check->box.intersect(r, tMin, tMax))
+				if (tMin - RAY_EPSILON < i.t){
+					curN = check;
+					break;
+				}
+			if (node.empty()) {
+				return have_one;
+
+			}
+		}
+	}
 }
 
 void Scene::initScene()
