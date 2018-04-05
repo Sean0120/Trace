@@ -186,6 +186,8 @@ void Scene::initScene()
 		{
 			boundedobjects.push_back(*j);
 
+			(*j)->ComputeBoundingBox();//compute boundingbox for each objects
+
 			// widen the scene's bounding box, if necessary
 			if (first_boundedobject) {
 				sceneBounds = (*j)->getBoundingBox();
@@ -201,6 +203,8 @@ void Scene::initScene()
 		else
 			nonboundedobjects.push_back(*j);
 	}
+
+
 }
 
 vec3f Scene::getAmbientLight() const {
@@ -234,4 +238,41 @@ void Scene::acc_shadow_attenuation(const ray& r, vec3f& result) {
 		}
 	}
 
+}
+
+void Scene::buildBVH(BVH_Node* root, vector<Geometry*> objects) {
+	if (objects.size() == 0) {
+		root->left = root->right = NULL;
+		return;
+	}
+	else if (objects.size() == 1) {
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]);
+		root->right = NULL;
+		return;
+	}
+	else if (objects.size() == 2) {
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]);
+		root->right = new BVH_Node(objects[1]->getBoundingBox(), objects[1]);
+		return;
+	}
+
+	int div = objects.size() / 2;
+	vector<Geometry*> lv;
+	vector<Geometry*> rv;
+	BoundingBox lb;
+	BoundingBox rb;
+	for (int i = 0; i < div; i++) {
+		lb.max = maximum(lb.max, (objects[i]->getBoundingBox).max);
+		lb.min = minimum(lb.min, (objects[i]->getBoundingBox).min);
+		lv.push_back(objects[i]);
+	}
+	for (int i = div; i < objects.size(); i++) {
+		rb.max = maximum(rb.max, (objects[i]->getBoundingBox).max);
+		rb.min = minimum(rb.min, (objects[i]->getBoundingBox).min);
+		rv.push_back(objects[i]);
+	}
+	root->left = new BVH_Node(lb);
+	root->right = new BVH_Node(rb);
+	buildBVH(root->left, lv);
+	buildBVH(root->right, rv);
 }

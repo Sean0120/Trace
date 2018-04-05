@@ -9,7 +9,7 @@
 
 #include <list>
 #include <algorithm>
-
+#include <vector>
 
 using namespace std;
 
@@ -20,7 +20,7 @@ using namespace std;
 
 class Light;
 class Scene;
-
+class BVH_Node;
 class SceneElement
 {
 public:
@@ -275,6 +275,8 @@ public:
 
 	vec3f getAmbientLight() const;
 	void acc_shadow_attenuation(const ray& r, vec3f &result);
+
+	
 private:
     list<Geometry*> objects;
 	list<Geometry*> nonboundedobjects;
@@ -288,6 +290,24 @@ private:
 	// must fall within this bounding box.  Objects that don't have hasBoundingBoxCapability()
 	// are exempt from this requirement.
 	BoundingBox sceneBounds;
+
+	// bvh tree
+	void buildBVH(BVH_Node* root, vector<Geometry*> objects);
 };
+
+class BVH_Node {
+public:
+	
+	BVH_Node() { left = right = NULL; isLeaf = false; obj = NULL; }
+	BVH_Node(BoundingBox b, bool is = false) { box = b; left = right = NULL; isLeaf = is; obj = NULL; }		//used only for internal nodes
+	BVH_Node(BoundingBox b, Geometry* g, bool is = true) { box = b; obj = g; isLeaf = is; }		//used only for leaf nodes
+	Geometry* obj;
+	BoundingBox box;
+	BVH_Node* left;
+	BVH_Node* right;
+	bool isLeaf;
+};
+
+
 
 #endif // __SCENE_H__
