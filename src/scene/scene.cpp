@@ -11,7 +11,7 @@ void BoundingBox::operator=(const BoundingBox& target)
 	max = target.max;
 }
 
-// Does this bounding box intersect the target?
+// Does this bounding box intersect the target?a
 bool BoundingBox::intersects(const BoundingBox &target) const
 {
 	return ((target.min[0] - RAY_EPSILON <= max[0]) && (target.max[0] + RAY_EPSILON >= min[0]) &&
@@ -289,7 +289,7 @@ void Scene::initScene()
 	BVH_Root = new BVH_Node(sceneBounds);
 	BVH_size = 1;
 	buildBVH(BVH_Root, obj);
-
+	//std::cout << getBVHSize(BVH_Root) << std::endl;
 }
 
 vec3f Scene::getAmbientLight() const {

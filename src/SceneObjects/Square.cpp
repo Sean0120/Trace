@@ -37,7 +37,7 @@ bool Square::intersectLocal( const ray& r, isect& i ) const
 
 	return true;
 }
-void Square::isectToTexture(const isect& i, const vec3f& pos , double& x, double& y)const {
+void Square::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)const {
 	vec3f posLocal = transform->globalToLocalCoords(pos);
 	x = (posLocal[0] + 0.5);
 	y = (posLocal[1] + 0.5);

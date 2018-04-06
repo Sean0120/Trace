@@ -23,7 +23,7 @@ public:
 	virtual bool intersectLocal( const ray& r, isect& i ) const;
 	virtual bool hasBoundingBoxCapability() const { return true; }
 
-    virtual BoundingBox ComputeLocalBoundingBox()const
+    virtual BoundingBox ComputeLocalBoundingBox() 
     {
         BoundingBox localbounds;
 		double biggest_radius = (b_radius > t_radius)?(b_radius):(t_radius);
@@ -35,8 +35,8 @@ public:
 
 	bool intersectBody( const ray& r, isect& i ) const;
 	bool intersectCaps( const ray& r, isect& i ) const;
-	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const;
 
+	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)const ;
 protected:
 	void computeABC()
 	{

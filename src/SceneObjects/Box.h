@@ -14,14 +14,14 @@ public:
 
 	virtual bool intersectLocal( const ray& r, isect& i ) const;
 	virtual bool hasBoundingBoxCapability() const { return true; }
-    virtual BoundingBox ComputeLocalBoundingBox()
+	virtual BoundingBox ComputeLocalBoundingBox() 
     {
         BoundingBox localbounds;
         localbounds.max = vec3f(0.5, 0.5, 0.5);
 		localbounds.min = vec3f(-0.5, -0.5, -0.5);
         return localbounds;
     }
-	void isectToTexture(const isect& i, const vec3f& pos,double& x, double& y) const;
+	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)const ;
 };
 
 #endif // __BOX_H__

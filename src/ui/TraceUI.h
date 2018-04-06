@@ -13,7 +13,7 @@
 #include <FL/Fl_Value_Slider.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Light_Button.H>
+
 #include <FL/fl_file_chooser.H>		// FLTK file chooser
 
 #include "TraceGLWindow.h"
@@ -31,16 +31,14 @@ public:
 	Fl_Slider*			m_thresholdSlider;
 	Fl_Button*			m_renderButton;
 	Fl_Button*			m_stopButton;
+	Fl_Light_Button*    m_adapativeSampling;
 	Fl_Slider*			m_constAttenSlider;
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
 	Fl_Slider*			m_samplingSlider;
-
-	Fl_Light_Button*    m_adapativeSampling;
 	Fl_Light_Button*    m_textureMapping;
-	Fl_Light_Button*    m_background;
-
 	Fl_Light_Button*	m_BVHButton;
+	Fl_Light_Button*    m_background;
 
 	TraceGLWindow*		m_traceGlWindow;
 
@@ -58,18 +56,15 @@ public:
 	void		setConstAttenuation(double value);
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
+	bool		getAllowBVH();
 
+	int			m_nSamplingSize;
 	bool		m_nAdaptive;
 	bool		m_nTexture;
 	bool		m_nBackground;
-
-	bool		getAllowBVH();
-
-
-	int			m_nSamplingSize;
 	RayTracer*	raytracer;
 private:
-	
+	//RayTracer*	raytracer;
 
 	int			m_nSize;
 	int			m_nDepth;
@@ -88,10 +83,9 @@ private:
 	static void cb_load_scene(Fl_Menu_* o, void* v);
 	static void cb_load_background(Fl_Menu_* o, void* v);
 	static void cb_save_image(Fl_Menu_* o, void* v);
-	static void cb_load_texture(Fl_Menu_* o, void* v);
-
 	static void cb_exit(Fl_Menu_* o, void* v);
 	static void cb_about(Fl_Menu_* o, void* v);
+	static void cb_load_texture(Fl_Menu_* o, void* v);
 
 	static void cb_exit2(Fl_Widget* o, void* v);
 
@@ -102,15 +96,10 @@ private:
 	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
 	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
 	static void cb_samplingSlides(Fl_Widget* o, void* v);
-
+	static void cb_BVHButton(Fl_Widget* o, void* v);
 	static void cb_adaptive(Fl_Widget* o, void* v);
 	static void cb_texture(Fl_Widget* o, void* v);
 	static void cb_background(Fl_Widget* o, void* v);
-
-	static void cb_BVHButton(Fl_Widget* o, void* v);
-
-
-
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

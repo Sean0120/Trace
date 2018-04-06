@@ -274,17 +274,15 @@ public:
         
 	Camera *getCamera() { return &camera; }
 
-	vec3f getAmbientLight() const;
-	void acc_shadow_attenuation(const ray& r, vec3f &result);
-
 	unsigned char*	m_ucBitmap;
 	int			m_nTextureWidth;
 	int			m_nTextureHeight;
 
+	vec3f getAmbientLight() const;
+	void acc_shadow_attenuation(const ray& r, vec3f &result);
 	int getBVHSize(BVH_Node* r);
 	void buildBVH(BVH_Node* root, vector<Geometry*> objects);
 	
-
 private:
     list<Geometry*> objects;
 	list<Geometry*> nonboundedobjects;

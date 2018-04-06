@@ -142,9 +142,14 @@ bool Cone::intersectCaps( const ray& r, isect& i ) const
 
 	return false;
 }
-void Cone::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {
+void Cone::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)  const{
 	vec3f posLocal = transform->globalToLocalCoords(pos);
-	BoundingBox bounds = ComputeLocalBoundingBox();
+	BoundingBox bound;
+	double biggest_radius = (b_radius > t_radius) ? (b_radius) : (t_radius);
+
+	bound.min = vec3f(-biggest_radius, -biggest_radius, (height < 0.0f) ? (height) : (0.0f));
+	bound.max = vec3f(biggest_radius, biggest_radius, (height < 0.0f) ? (0.0f) : (height));
+	
 
 	if (abs(posLocal[2] - bounds.min[2]) < 1e-8 ||
 		abs(posLocal[2] - bounds.max[2]) < 1e-8)

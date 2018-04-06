@@ -15,7 +15,7 @@ public:
 	virtual bool intersectLocal( const ray& r, isect& i ) const;
 	virtual bool hasBoundingBoxCapability() const { return true; }
 
-    virtual BoundingBox ComputeLocalBoundingBox()
+    virtual BoundingBox ComputeLocalBoundingBox() 
     {
         BoundingBox localbounds;
 		localbounds.min = vec3f(-1.0f, -1.0f, 0.0f);
@@ -25,8 +25,7 @@ public:
 
     bool intersectBody( const ray& r, isect& i ) const;
 	bool intersectCaps( const ray& r, isect& i ) const;
-	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const;
-
+	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)const ;
 protected:
 	bool capped;
 };

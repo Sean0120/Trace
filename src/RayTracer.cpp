@@ -20,6 +20,36 @@ extern TraceUI* traceUI;
 vec3f RayTracer::trace( Scene *scene, double x, double y )
 {
 	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));
+		
+	/*if (traceUI->m_nSamplingSize == 0) {
+		scene->getCamera()->rayThrough(x, y, r);
+		index = stack<double>();
+		index.push(1.0);
+		return traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+	}
+	else
+	{
+		int samplesize = traceUI->m_nSamplingSize;
+
+		
+		vec3f sum(0,0,0);
+		for (int i = 0; i < samplesize; i++) {
+			for (int j = 0; j < samplesize; j++) {
+				double rx = double(rand()%10000)  /10000-0.5;
+				double ry = double(rand()%10000)  /10000-0.5; 
+				//cout << rx << " " << ry << endl;
+				//scene->getCamera()->rayThrough(x, y, r);
+				scene->getCamera()->rayThrough(x +(rx -samplesize/2 +i)/buffer_width, y+(ry - samplesize / 2 +j)/buffer_height, r);
+				index = stack<double>();
+				index.push(1.0);
+
+				sum += traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+
+			}
+		}
+		sum = sum / (samplesize*samplesize);
+		return sum;
+	}*/
 	if (traceUI->m_nAdaptive == FALSE) {
 		if (traceUI->m_nSamplingSize == 0) {
 			scene->getCamera()->rayThrough(x, y, r);
@@ -37,7 +67,7 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 					double ry = double(rand() % 10000) / 10000 - 0.5;
 					//cout << rx << " " << ry << endl;
 					//scene->getCamera()->rayThrough(x, y, r);
-					scene->getCamera()->rayThrough(x + (rx - double(samplesize-1) / 2 + i) / buffer_width, y + (ry - double(samplesize-1) / 2 + j) / buffer_height, r);
+					scene->getCamera()->rayThrough(x + (rx - double(samplesize - 1) / 2 + i) / buffer_width, y + (ry - double(samplesize - 1) / 2 + j) / buffer_height, r);
 					index = stack<double>();
 					index.push(1.0);
 					sum += traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
@@ -49,26 +79,26 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 	}
 	else
 	{
-		return AdaptiveSampling(scene,0, x, y);
+		return AdaptiveSampling(scene, 0, x, y);
 	}
 }
 
 //do recursive for adaptive sampling
-vec3f RayTracer::AdaptiveSampling(Scene *scene,int depth, double x, double y) {
-	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));	
+vec3f RayTracer::AdaptiveSampling(Scene *scene, int depth, double x, double y) {
+	ray r(vec3f(0, 0, 0), vec3f(0, 0, 0));
 	vec3f sum(0, 0, 0);
 	vec3f ray4[4];
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
-			scene->getCamera()->rayThrough(x + ( i- 0.5 ) / buffer_width/ pow(3,depth), y + (j- 0.5 ) / buffer_height / pow(3, depth), r);
+			scene->getCamera()->rayThrough(x + (i - 0.5) / buffer_width / pow(3, depth), y + (j - 0.5) / buffer_height / pow(3, depth), r);
 			index = stack<double>();
 			index.push(1.0);
-			ray4[2*i+j]= traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
+			ray4[2 * i + j] = traceRay(scene, r, vec3f(threshold, threshold, threshold), traceUI->getDepth()).clamp();
 			sum += ray4[2 * i + j];
 		}
 	}
-	sum = sum / (2*2);
-	double error = 0; 
+	sum = sum / (2 * 2);
+	double error = 0;
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 4; j++) {
 			error += fabsf(sum[i] - ray4[j][i]);
@@ -87,10 +117,10 @@ vec3f RayTracer::AdaptiveSampling(Scene *scene,int depth, double x, double y) {
 		vec3f sum(0, 0, 0);
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				sum += AdaptiveSampling(scene, depth , x +(i-1)/pow(3,depth) / buffer_width, y + (j - 1) / pow(3, depth) / buffer_height);
+				sum += AdaptiveSampling(scene, depth, x + (i - 1) / pow(3, depth) / buffer_width, y + (j - 1) / pow(3, depth) / buffer_height);
 			}
 		}
-		return sum/9;
+		return sum / 9;
 
 	}
 }
@@ -103,10 +133,9 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 	
 	//if (depth <= 0)
 		//return vec3f(0, 0, 0); //terminate recursion
-	
+
 	isect i;
-	//ray refracted_ray(vec3f(0, 0, 0), vec3f(0, 0, 0));
-	//cout << "_____"<<r.getPosition() << endl;
+
 	if( scene->intersect( r, i ) ) {
 		// YOUR CODE HERE
 
@@ -120,9 +149,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// rays.
 		double curI = index.top();	//index of current material
 		vec3f P = r.at(i.t);	//intersection point
-
 		
-
 		const Material& m = i.getMaterial();
 		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
@@ -135,15 +162,12 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f uL = -(r.getDirection().normalize());
 		//vec3f uN = i.N.normalize();
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
-
 		ray reflected_ray(P, uR); 
-
 		double intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
 		double intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
 		double intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
-		if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2]) && !m.kr.iszero()) {
-			I = I + prod(m.kr, traceRay(scene, reflected_ray, thresh, depth - 1));
-		}
+		if ((intensity_0 > thresh[0] || intensity_1 > thresh[1]|| intensity_2 > thresh[2])&&!m.kr.iszero())
+			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 		index.pop();
 
 		bool get_out = (uL.dot(uN) -RAY_EPSILON< 0.0);
@@ -160,16 +184,14 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			double cost = sqrt(1 - ratio * ratio*(1 - cosi));
 			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
 			
-
-			ray refracted_ray(P, uT);
-
+			ray refracted_ray(P, uT); 
+			
 			intensity_0 = pow(m.kt[0], traceUI->getDepth() - depth);
 			intensity_1 = pow(m.kt[1], traceUI->getDepth() - depth);
 			intensity_2 = pow(m.kt[2], traceUI->getDepth() - depth);
-			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2]) && !m.kt.iszero()) {
+			if ((intensity_0 > thresh[0] || intensity_1 > thresh[1] || intensity_2 > thresh[2])&&!m.kt.iszero())
 				I = I + prod(m.kt, traceRay(scene, refracted_ray, thresh, depth - 1));
-				
-			}
+
 		}
 		else {
 			intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
@@ -182,10 +204,8 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 		return I.clamp();
 	
-
-	}
-	else {
-
+	} else {
+		
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
@@ -236,7 +256,8 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 
 			return getBackgroundPixel(int(background_width*x), int(background_height*y));
 		}
-		return vec3f(0, 0, 0);
+
+		return vec3f( 0.0, 0.0, 0.0 );
 	}
 }
 
@@ -341,9 +362,9 @@ vec3f RayTracer::getBackgroundPixel(int x, int y) {
 	else if (y >= background_height)
 		y = background_height - 1;
 
-	double r = ((double)(*(background + 3 * (y*background_width + x)))) / 255.0;
-	double g = ((double)(*(background + 3 * (y*background_width + x)+1))) / 255.0;
-	double b = ((double)(*(background + 3 * (y*background_width + x)+2))) / 255.0;
+	double r = ((double)(*(background + 3 * (y*background_width + x)))) / 256.0;
+	double g = ((double)(*(background + 3 * (y*background_width + x)+1))) / 256.0;
+	double b = ((double)(*(background + 3 * (y*background_width + x)+2))) / 256.0;
 	
 	return vec3f(r, g, b);
 }
@@ -385,7 +406,7 @@ void RayTracer::tracePixel( int i, int j )
 
 	double x = double(i)/double(buffer_width);
 	double y = double(j)/double(buffer_height);
-	//cout << x << " " << y << endl;
+
 	col = trace( scene,x,y );
 
 	unsigned char *pixel = buffer + ( i + j * buffer_width ) * 3;

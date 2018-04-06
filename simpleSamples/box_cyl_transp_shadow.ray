@@ -35,6 +35,6 @@ translate( 0, 0, 1,
 		material = {
 			ambient = (0, 0.3, 0);
 			diffuse = (0, 0.9, 0);
-			transmissive = (0.5, 0.5, 0.5);
+			transmissive = (0.7, 0.7, 0.7);
 		}
 	} )

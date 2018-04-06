@@ -19,8 +19,6 @@
 #include "../SceneObjects/Cylinder.h"
 #include "../SceneObjects/Sphere.h"
 #include "../SceneObjects/Square.h"
-#include "..\SceneObjects\Hyperboloid.h"
-#include "../SceneObjects/Eliptic.h"
 #include "../scene/light.h"
 
 typedef map<string,Material*> mmap;
@@ -306,10 +304,6 @@ static void processGeometry( string name, Obj *child, Scene *scene,
 
 		if( name == "sphere" ) {
 			obj = new Sphere( scene, mat );
-		}else if (name == "hyperboloid") {
-			obj = new Hyperboloid(scene, mat);
-		}else if (name == "eliptic") {
-			obj = new Eliptic(scene, mat);
 		} else if( name == "box" ) {
 			obj = new Box( scene, mat );
 		} else if( name == "cylinder" ) {
@@ -657,9 +651,7 @@ static void processObject( Obj *obj, Scene *scene, mmap& materials )
 		scene->set_ambient_light(tupleToVec(getColorField(child)));
 		
 	}
-	else if( 	name == "hyperboloid"||
-				name == "eliptic"||
-				name == "sphere" ||
+	else if( 	name == "sphere" ||
 				name == "box" ||
 				name == "cylinder" ||
 				name == "cone" ||

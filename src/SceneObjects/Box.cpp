@@ -67,24 +67,23 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 	return true; 
 	
 }
-
-void Box::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {
+void Box::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y)const  {
 	vec3f posLocal = transform->globalToLocalCoords(pos);
 	//cout << posLocal << endl;
 	if (0.5 - abs(posLocal[0]) < RAY_EPSILON)
 	{
-		x = (posLocal[1] + 0.5) ;
-		y = (posLocal[2] + 0.5) ;
+		x = (posLocal[1] + 0.5);
+		y = (posLocal[2] + 0.5);
 	}
 	else if (0.5 - abs(posLocal[1]) < RAY_EPSILON)
 	{
-		x = (posLocal[0] + 0.5) ;
-		y = (posLocal[2] + 0.5) ;
+		x = (posLocal[0] + 0.5);
+		y = (posLocal[2] + 0.5);
 	}
 	else
 	{
-		x = (posLocal[0] + 0.5) ;
-		y = (posLocal[1] + 0.5) ;
+		x = (posLocal[0] + 0.5);
+		y = (posLocal[1] + 0.5);
 	}
 	//cout << x << " " << y << endl;
 }

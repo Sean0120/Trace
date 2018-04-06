@@ -154,10 +154,10 @@ void Cylinder::isectToTexture(const isect& i, const vec3f& pos, double& x, doubl
 	}
 	else
 	{
-		theta = 2 * M_PI- acos(posLocal[0]);
+		theta = 2 * M_PI - acos(posLocal[0]);
 	}
 
-	x = theta / (2 * M_PI) ;
-	y = posLocal[2] ;
+	x = theta / (2 * M_PI);
+	y = posLocal[2];
 
 }

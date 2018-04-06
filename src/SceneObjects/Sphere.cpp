@@ -33,13 +33,14 @@ bool Sphere::intersectLocal( const ray& r, isect& i ) const
 
 	return true;
 }
+
 void Sphere::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {
 	vec3f Sp(0, 0, 1);
 	vec3f Se(1, 0, 0);
 	vec3f Sn = i.N;
 	double phi = acos(-Sn * Sp);
 	y = phi / M_PI;
-	if (y == 0 ||y ==1)
+	if (y == 0 || y == 1)
 	{
 		x = 0;
 		return;
@@ -53,5 +54,3 @@ void Sphere::isectToTexture(const isect& i, const vec3f& pos, double& x, double&
 		x = 1 - theta;
 	}
 }
-
-

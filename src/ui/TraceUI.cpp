@@ -11,7 +11,8 @@
 
 #include "TraceUI.h"
 #include "../RayTracer.h"
-#include "../fileio/bitmap.h"
+#include "..\fileio\bitmap.h"
+
 
 static bool done;
 
@@ -42,7 +43,6 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 	}
 }
 
-
 void TraceUI::cb_load_texture(Fl_Menu_* o, void* v) {
 	TraceUI* pUI = whoami(o);
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", NULL);
@@ -60,6 +60,7 @@ void TraceUI::cb_load_texture(Fl_Menu_* o, void* v) {
 		pUI->raytracer->scene->m_nTextureWidth = width;
 	}
 }
+
 void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 {
 	TraceUI* pUI = whoami(o);
@@ -77,7 +78,6 @@ void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 		}
 
 		pUI->m_mainWindow->label(buf);
-
 	}
 }
 
@@ -151,14 +151,11 @@ void TraceUI::cb_samplingSlides(Fl_Widget* o, void* v) {
 	((TraceUI*)(o->user_data()))->m_nSamplingSize = int(((Fl_Slider *)o)->value());
 }
 
-void TraceUI::cb_adaptive(Fl_Widget* o, void* v) {
-
-	((TraceUI*)(o->user_data()))->m_nAdaptive = !((TraceUI*)(o->user_data()))->m_nAdaptive;
-}
 void TraceUI::cb_texture(Fl_Widget* o, void* v) {
 
 	((TraceUI*)(o->user_data()))->m_nTexture = !((TraceUI*)(o->user_data()))->m_nTexture;
 }
+
 void TraceUI::cb_background(Fl_Widget* o, void* v) {
 
 	((TraceUI*)(o->user_data()))->m_nBackground = !((TraceUI*)(o->user_data()))->m_nBackground;
@@ -170,6 +167,11 @@ void TraceUI::cb_BVHButton(Fl_Widget* o, void* v) {
 
 	if (pUI->m_nallowBVH == true) pUI->m_nallowBVH = false;
 	else pUI->m_nallowBVH = true;
+}
+
+void TraceUI::cb_adaptive(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nAdaptive = !((TraceUI*)(o->user_data()))->m_nAdaptive;
 }
 
 void TraceUI::cb_render(Fl_Widget* o, void* v)
@@ -314,8 +316,8 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Load Background...", FL_ALT+'b', (Fl_Callback *)TraceUI::cb_load_background },
-		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
 		{ "&Load Texture",	FL_ALT + 't', (Fl_Callback *)TraceUI::cb_load_texture },
+		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 
@@ -335,15 +337,11 @@ TraceUI::TraceUI() {
 	m_nlinearAtten = 0.2;
 	m_nquadraAtten = 0.0;
 	m_nSamplingSize = 0;
-
+	m_nallowBVH = false;
 	m_nAdaptive = FALSE;
 	m_nTexture = FALSE;
-	m_nBackground = FALSE;
-
-	m_nallowBVH = false;
 
 	m_mainWindow = new Fl_Window(100, 40, 350, 400, "Ray <Not Loaded>");
-
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
@@ -369,7 +367,7 @@ TraceUI::TraceUI() {
         m_sizeSlider->labelfont(FL_COURIER);
         m_sizeSlider->labelsize(12);
 		m_sizeSlider->minimum(64);
-		m_sizeSlider->maximum(512);
+		m_sizeSlider->maximum(505);
 		m_sizeSlider->step(1);
 		m_sizeSlider->value(m_nSize);
 		m_sizeSlider->align(FL_ALIGN_RIGHT);
@@ -438,17 +436,14 @@ TraceUI::TraceUI() {
 		m_samplingSlider->align(FL_ALIGN_RIGHT);
 		m_samplingSlider->callback(cb_samplingSlides);
 
-		m_adapativeSampling = new Fl_Light_Button(280, 180, 80, 20, "Adaptive");
-		m_adapativeSampling->user_data((void*)(this));
-		m_adapativeSampling->callback(cb_adaptive);
-	
+
 		m_textureMapping = new Fl_Light_Button(10, 205, 80, 20, "texture");
 		m_textureMapping->user_data((void*)(this));
 		m_textureMapping->callback(cb_texture);
 
-		m_background = new Fl_Light_Button(100, 205, 80, 20, "background");
-		m_background->user_data((void*)(this));
-		m_background->callback(cb_background);
+		m_adapativeSampling = new Fl_Light_Button(280, 180, 80, 20, "Adaptive");
+		m_adapativeSampling->user_data((void*)(this));
+		m_adapativeSampling->callback(cb_adaptive);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
@@ -461,6 +456,10 @@ TraceUI::TraceUI() {
 		m_BVHButton = new Fl_Light_Button(240, 240, 70, 25, "BVH");
 		m_BVHButton->user_data((void*)(this));
 		m_BVHButton->callback(cb_BVHButton);
+
+		m_background = new Fl_Light_Button(100, 205, 80, 20, "background");
+		m_background->user_data((void*)(this));
+		m_background->callback(cb_background);
 
 		m_mainWindow->callback(cb_exit2);
 		m_mainWindow->when(FL_HIDE);
