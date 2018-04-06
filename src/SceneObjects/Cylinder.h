@@ -25,6 +25,7 @@ public:
 
     bool intersectBody( const ray& r, isect& i ) const;
 	bool intersectCaps( const ray& r, isect& i ) const;
+	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const;
 
 protected:
 	bool capped;

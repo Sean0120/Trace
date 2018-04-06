@@ -22,7 +22,9 @@ Camera::rayThrough( double x, double y, ray &r )
     x -= 0.5;
     y -= 0.5;
     vec3f dir = look + x * u + y * v;
+
     r = ray( eye, dir.normalize() );
+
 }
 
 void

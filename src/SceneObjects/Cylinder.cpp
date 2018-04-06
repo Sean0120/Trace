@@ -141,3 +141,23 @@ bool Cylinder::intersectCaps( const ray& r, isect& i ) const
 
 	return false;
 }
+void Cylinder::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {
+	vec3f posLocal = transform->globalToLocalCoords(pos);
+	if (posLocal[2] < 1e-8 || 1 - posLocal[2] < 1e-8) {
+		return;
+	}
+	//caps have no texture
+	double theta;
+	if (posLocal[1] > 0)
+	{
+		theta = acos(posLocal[0]);
+	}
+	else
+	{
+		theta = 2 * M_PI- acos(posLocal[0]);
+	}
+
+	x = theta / (2 * M_PI) ;
+	y = posLocal[2] ;
+
+}

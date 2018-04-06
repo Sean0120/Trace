@@ -142,3 +142,24 @@ bool Cone::intersectCaps( const ray& r, isect& i ) const
 
 	return false;
 }
+void Cone::isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const {
+	vec3f posLocal = transform->globalToLocalCoords(pos);
+	BoundingBox bounds = ComputeLocalBoundingBox();
+
+	if (abs(posLocal[2] - bounds.min[2]) < 1e-8 ||
+		abs(posLocal[2] - bounds.max[2]) < 1e-8)
+		return;
+
+	double theta;
+	if (posLocal[1] > 0)
+	{
+		theta = acos(posLocal[0]);
+	}
+	else
+	{
+		theta = 2 * M_PI - acos(posLocal[0]);
+	}
+
+	x = theta / (2 * M_PI);
+	y = posLocal[2];
+}

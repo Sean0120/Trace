@@ -11,7 +11,10 @@ directional_light {
 	direction = (0, -1, 0);
 	colour = (1.0, 1.0, 1.0);
 }
-
+directional_light {
+	direction = (0, 0, 1);
+	colour = (1.0, 1.0, 1.0);
+}
 directional_light {
 	direction = (0,1,0);
 	colour = (0.2,0.2,0.2);

@@ -114,6 +114,12 @@
     <ClCompile Include="src\RayTracer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SceneObjects\Hyperboloid.cpp">
+      <Filter>Source Files\SceneObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SceneObjects\Eliptic.cpp">
+      <Filter>Source Files\SceneObjects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\RayTracer.h">
@@ -168,6 +174,12 @@
       <Filter>Header Files\SceneObjects.</Filter>
     </ClInclude>
     <ClInclude Include="src\SceneObjects\trimesh.h">
+      <Filter>Header Files\SceneObjects.</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneObjects\Hyperboloid.h">
+      <Filter>Header Files\SceneObjects.</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SceneObjects\Eliptic.h">
       <Filter>Header Files\SceneObjects.</Filter>
     </ClInclude>
   </ItemGroup>

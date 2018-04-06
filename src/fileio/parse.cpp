@@ -217,6 +217,7 @@ static Obj *readDict( istream& is )
 		lhs = readID( is );
 		eat( is );
 		if( is.get() != '=' ) {
+
 			throw ParseError( "Parse error: expected equals." );
 		}
 		rhs = readObject( is );

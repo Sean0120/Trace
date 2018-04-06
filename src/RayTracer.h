@@ -31,14 +31,15 @@ public:
 	void traceThreshold(double value) {
 		threshold = value;
 	}
-	
+	vec3f AdaptiveSampling(Scene *scene,int depth, double x, double y);
+	Scene *scene;
+
 private:
 	unsigned char *buffer;
 	int buffer_width, buffer_height;
 	int bufferSize;
 	double threshold;
-	Scene *scene;
-
+	
 	bool m_bSceneLoaded;
 
 	stack<double> index;

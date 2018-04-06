@@ -11,6 +11,7 @@
 
 #include "TraceUI.h"
 #include "../RayTracer.h"
+#include "../fileio/bitmap.h"
 
 static bool done;
 
@@ -41,6 +42,24 @@ void TraceUI::cb_load_scene(Fl_Menu_* o, void* v)
 	}
 }
 
+
+void TraceUI::cb_load_texture(Fl_Menu_* o, void* v) {
+	TraceUI* pUI = whoami(o);
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", NULL);
+	if (newfile != NULL) {
+		unsigned char*	data;
+		int				width, height;
+
+		if ((data = readBMP(newfile, width, height)) == NULL)
+		{
+			fl_alert("Can't load bitmap file");
+			return;
+		}
+		pUI->raytracer->scene->m_ucBitmap = data;
+		pUI->raytracer->scene->m_nTextureHeight = height;
+		pUI->raytracer->scene->m_nTextureWidth = width;
+	}
+}
 void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 {
 	TraceUI* pUI = whoami(o);
@@ -58,6 +77,7 @@ void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 		}
 
 		pUI->m_mainWindow->label(buf);
+
 	}
 }
 
@@ -130,6 +150,20 @@ void TraceUI::cb_quadraAttenSlides(Fl_Widget* o, void* v) {
 void TraceUI::cb_samplingSlides(Fl_Widget* o, void* v) {
 	((TraceUI*)(o->user_data()))->m_nSamplingSize = int(((Fl_Slider *)o)->value());
 }
+
+void TraceUI::cb_adaptive(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nAdaptive = !((TraceUI*)(o->user_data()))->m_nAdaptive;
+}
+void TraceUI::cb_texture(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nTexture = !((TraceUI*)(o->user_data()))->m_nTexture;
+}
+void TraceUI::cb_background(Fl_Widget* o, void* v) {
+
+	((TraceUI*)(o->user_data()))->m_nBackground = !((TraceUI*)(o->user_data()))->m_nBackground;
+}
+
 
 void TraceUI::cb_BVHButton(Fl_Widget* o, void* v) {
 	TraceUI* pUI = ((TraceUI*)(o->user_data()));
@@ -281,6 +315,7 @@ Fl_Menu_Item TraceUI::menuitems[] = {
 		{ "&Load Scene...",	FL_ALT + 'l', (Fl_Callback *)TraceUI::cb_load_scene },
 		{ "&Load Background...", FL_ALT+'b', (Fl_Callback *)TraceUI::cb_load_background },
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)TraceUI::cb_save_image },
+		{ "&Load Texture",	FL_ALT + 't', (Fl_Callback *)TraceUI::cb_load_texture },
 		{ "&Exit",			FL_ALT + 'e', (Fl_Callback *)TraceUI::cb_exit },
 		{ 0 },
 
@@ -300,9 +335,15 @@ TraceUI::TraceUI() {
 	m_nlinearAtten = 0.2;
 	m_nquadraAtten = 0.0;
 	m_nSamplingSize = 0;
+
+	m_nAdaptive = FALSE;
+	m_nTexture = FALSE;
+	m_nBackground = FALSE;
+
 	m_nallowBVH = false;
 
 	m_mainWindow = new Fl_Window(100, 40, 350, 400, "Ray <Not Loaded>");
+
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
 		m_menubar = new Fl_Menu_Bar(0, 0, 350, 25);
@@ -397,7 +438,17 @@ TraceUI::TraceUI() {
 		m_samplingSlider->align(FL_ALIGN_RIGHT);
 		m_samplingSlider->callback(cb_samplingSlides);
 
+		m_adapativeSampling = new Fl_Light_Button(280, 180, 80, 20, "Adaptive");
+		m_adapativeSampling->user_data((void*)(this));
+		m_adapativeSampling->callback(cb_adaptive);
+	
+		m_textureMapping = new Fl_Light_Button(10, 205, 80, 20, "texture");
+		m_textureMapping->user_data((void*)(this));
+		m_textureMapping->callback(cb_texture);
 
+		m_background = new Fl_Light_Button(100, 205, 80, 20, "background");
+		m_background->user_data((void*)(this));
+		m_background->callback(cb_background);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));

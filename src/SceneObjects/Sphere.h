@@ -22,5 +22,7 @@ public:
 		localbounds.max = vec3f(1.0f, 1.0f, 1.0f);
         return localbounds;
     }
+	void isectToTexture(const isect& i, const vec3f& pos, double& x, double& y) const;
+
 };
 #endif // __SPHERE_H__
