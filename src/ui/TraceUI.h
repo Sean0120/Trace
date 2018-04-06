@@ -35,6 +35,7 @@ public:
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
 	Fl_Slider*			m_samplingSlider;
+	Fl_Light_Button*	m_BVHButton;
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -51,6 +52,7 @@ public:
 	void		setConstAttenuation(double value);
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
+	bool		getAllowBVH();
 
 	int			m_nSamplingSize;
 private:
@@ -62,6 +64,7 @@ private:
 	double		m_nconstAtten;
 	double		m_nlinearAtten;
 	double		m_nquadraAtten;
+	bool		m_nallowBVH;
 	
 
 // static class members
@@ -84,6 +87,7 @@ private:
 	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
 	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
 	static void cb_samplingSlides(Fl_Widget* o, void* v);
+	static void cb_BVHButton(Fl_Widget* o, void* v);
 
 
 
