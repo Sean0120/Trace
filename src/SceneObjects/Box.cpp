@@ -60,6 +60,7 @@ bool Box::intersectLocal( const ray& r, isect& i ) const
 		if (tMax < RAY_EPSILON) // box is behind ray
 			return false;
 	}
+	Nmin = (tMin - RAY_EPSILON <= 0.0 ? Nmax : Nmin);
 	tMin = (tMin - RAY_EPSILON <= 0.0 ? tMax : tMin);
 	i.setT(tMin);
 	i.setN(Nmin);

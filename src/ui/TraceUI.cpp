@@ -369,7 +369,7 @@ TraceUI::TraceUI() {
         m_sizeSlider->labelfont(FL_COURIER);
         m_sizeSlider->labelsize(12);
 		m_sizeSlider->minimum(64);
-		m_sizeSlider->maximum(505);
+		m_sizeSlider->maximum(512);
 		m_sizeSlider->step(1);
 		m_sizeSlider->value(m_nSize);
 		m_sizeSlider->align(FL_ALIGN_RIGHT);
