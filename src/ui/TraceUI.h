@@ -35,9 +35,13 @@ public:
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
 	Fl_Slider*			m_samplingSlider;
+<<<<<<< HEAD
 	Fl_Light_Button*    m_adapativeSampling;
 	Fl_Light_Button*    m_textureMapping;
 	Fl_Light_Button*    m_background;
+=======
+	Fl_Light_Button*	m_BVHButton;
+>>>>>>> dev_WANG
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -54,9 +58,14 @@ public:
 	void		setConstAttenuation(double value);
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
+<<<<<<< HEAD
 	bool		m_nAdaptive;
 	bool		m_nTexture;
 	bool		m_nBackground;
+=======
+	bool		getAllowBVH();
+
+>>>>>>> dev_WANG
 	int			m_nSamplingSize;
 	RayTracer*	raytracer;
 private:
@@ -68,6 +77,7 @@ private:
 	double		m_nconstAtten;
 	double		m_nlinearAtten;
 	double		m_nquadraAtten;
+	bool		m_nallowBVH;
 	
 
 // static class members
@@ -92,9 +102,15 @@ private:
 	static void cb_linearAttenSlides(Fl_Widget* o, void* v);
 	static void cb_quadraAttenSlides(Fl_Widget* o, void* v);
 	static void cb_samplingSlides(Fl_Widget* o, void* v);
+
 	static void cb_adaptive(Fl_Widget* o, void* v);
 	static void cb_texture(Fl_Widget* o, void* v);
 	static void cb_background(Fl_Widget* o, void* v);
+
+	static void cb_BVHButton(Fl_Widget* o, void* v);
+
+
+
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

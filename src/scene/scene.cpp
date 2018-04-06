@@ -144,40 +144,121 @@ Scene::~Scene()
 // intersection through the reference parameter.
 bool Scene::intersect( const ray& r, isect& i ) const
 {
-	typedef list<Geometry*>::const_iterator iter;
-	iter j;
+	if (traceUI->getAllowBVH() == false) {
+		typedef list<Geometry*>::const_iterator iter;
+		iter j;
 
-	isect cur;
-	bool have_one = false;
+		isect cur;
+		bool have_one = false;
 
-	// try the non-bounded objects
-	for( j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
+		// try the non-bounded objects
+		for (j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j) {
+			if ((*j)->intersect(r, cur)) {
+				if (!have_one || (cur.t < i.t)) {
+					i = cur;
+					have_one = true;
+				}
 			}
 		}
-	}
 
-	// try the bounded objects
-	for( j = boundedobjects.begin(); j != boundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
+		// try the bounded objects
+		for (j = boundedobjects.begin(); j != boundedobjects.end(); ++j) {
+			if ((*j)->intersect(r, cur)) {
+				if (!have_one || (cur.t < i.t)) {
+					i = cur;
+					have_one = true;
+				}
 			}
 		}
+
+
+		return have_one;
 	}
+	else {
+		bool have_one = false;
+
+		double tMax, tMin;
+		if (BVH_Root == NULL || BVH_Root->box.intersect(r, tMin, tMax) == false) {
+			return false;
+		}
 
 
-	return have_one;
+		stack<BVH_Node*> node;
+		double tMaxl, tMinl, tMaxr, tMinr;
+		double minT = 1.0e308;
+		isect curI;
+		BVH_Node* curN = BVH_Root;
+		while (true) {
+			if (!curN->isLeaf) {
+				bool li = false;
+				bool ri = false;
+				if (curN->left != NULL) {
+					li = curN->left->box.intersect(r, tMinl, tMaxl);
+					tMinl = (tMinl < 0.0 ? tMaxl : tMinl);
+				}
+				if (curN->right != NULL) {
+					ri = curN->right->box.intersect(r, tMinr, tMaxr);
+					tMinr = (tMinr < 0.0 ? tMaxr : tMinr);
+				}
+				if (li&&ri) {
+					node.push(curN->right);
+					curN = curN->left;
+					continue;
+					/*if (tMinl - RAY_EPSILON <= tMinr) {
+						node.push(curN->right);
+						curN = curN->left;
+						continue;
+					}
+					else {
+						node.push(curN->left);
+						curN = curN->right;
+						continue;
+					}*/
+				}
+				else if (li == true) {
+					curN = curN->left;
+					continue;
+				}
+				else if (ri == true) {
+					curN = curN->right;
+					continue;
+				}
+			}
+			else {
+				if (curN->obj->intersect(r, curI)) {
+					if (have_one != true || curI.t - RAY_EPSILON <= i.t) {
+						i = curI;
+						have_one = true;
+					}
+				}
+			}
+			if (node.empty()) {
+				return have_one;
+			}
+			curN = node.top();
+			node.pop();
+			/*while (!node.empty()) {
+				BVH_Node* check = node.top();
+				node.pop();
+				if (check->box.intersect(r, tMin, tMax))
+					tMin = (tMin < 0.0 ? tMax : tMin);
+					if (tMin - RAY_EPSILON < i.t){
+						curN = check;
+						break;
+					}
+				if (node.empty()) {
+					return have_one;
+				}
+			}*/
+		}
+	}
 }
 
 void Scene::initScene()
 {
 	bool first_boundedobject = true;
 	BoundingBox b;
+	vector<Geometry*> obj;
 	
 	typedef list<Geometry*>::const_iterator iter;
 	// split the objects into two categories: bounded and non-bounded
@@ -185,6 +266,9 @@ void Scene::initScene()
 		if( (*j)->hasBoundingBoxCapability() )
 		{
 			boundedobjects.push_back(*j);
+			obj.push_back(*j);
+
+			(*j)->ComputeBoundingBox();//compute boundingbox for each objects
 
 			// widen the scene's bounding box, if necessary
 			if (first_boundedobject) {
@@ -201,6 +285,11 @@ void Scene::initScene()
 		else
 			nonboundedobjects.push_back(*j);
 	}
+
+	BVH_Root = new BVH_Node(sceneBounds);
+	BVH_size = 1;
+	buildBVH(BVH_Root, obj);
+
 }
 
 vec3f Scene::getAmbientLight() const {
@@ -234,4 +323,47 @@ void Scene::acc_shadow_attenuation(const ray& r, vec3f& result) {
 		}
 	}
 
+}
+
+void Scene::buildBVH(BVH_Node* root, vector<Geometry*> objects) {
+	if (objects.size() == 0) {
+		root->left = root->right = NULL;
+		return;
+	}
+	else if (objects.size() == 1) {
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]); BVH_size++;
+		root->right = NULL;
+		return;
+	}
+	else if (objects.size() == 2) {
+		root->left = new BVH_Node(objects[0]->getBoundingBox(), objects[0]); BVH_size++;
+		root->right = new BVH_Node(objects[1]->getBoundingBox(), objects[1]); BVH_size++;
+		return;
+	}
+
+	int div = objects.size() / 2;
+	vector<Geometry*> lv;
+	vector<Geometry*> rv;
+	BoundingBox lb;
+	BoundingBox rb;
+	for (int i = 0; i < div; i++) {
+		lb.max = maximum(lb.max, (objects[i]->getBoundingBox()).max);
+		lb.min = minimum(lb.min, (objects[i]->getBoundingBox()).min);
+		lv.push_back(objects[i]);
+	}
+	for (int i = div; i < objects.size(); i++) {
+		rb.max = maximum(rb.max, (objects[i]->getBoundingBox()).max);
+		rb.min = minimum(rb.min, (objects[i]->getBoundingBox()).min);
+		rv.push_back(objects[i]);
+	}
+	root->left = new BVH_Node(lb); BVH_size++;
+	root->right = new BVH_Node(rb); BVH_size++;
+	buildBVH(root->left, lv);
+	buildBVH(root->right, rv);
+}
+int Scene::getBVHSize(BVH_Node* r) {
+	if (r == NULL)
+		return 0;
+	else
+		return 1 + getBVHSize(r->left) + getBVHSize(r->right);
 }
