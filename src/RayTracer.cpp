@@ -56,7 +56,8 @@ vec3f RayTracer::trace( Scene *scene, double x, double y )
 // (or places called from here) to handle reflection, refraction, etc etc.
 vec3f RayTracer::traceRay( Scene *scene, const ray& r, 
 	const vec3f& thresh, int depth )
-{	
+{
+	
 	//if (depth <= 0)
 		//return vec3f(0, 0, 0); //terminate recursion
 
@@ -75,6 +76,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		// rays.
 		double curI = index.top();	//index of current material
 		vec3f P = r.at(i.t);	//intersection point
+		
 		const Material& m = i.getMaterial();
 		if (depth <= 0)		//terminating recursion
 			return m.shade(scene, r, i);
@@ -87,7 +89,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		vec3f uL = -(r.getDirection().normalize());
 		//vec3f uN = i.N.normalize();
 		vec3f uR = (2 * (uN.dot(uL))*uN - uL).normalize();
-		ray reflected_ray(P, uR);
+		ray reflected_ray(P, uR); 
 		double intensity_0 = pow(m.kr[0], traceUI->getDepth() - depth);
 		double intensity_1 = pow(m.kr[1], traceUI->getDepth() - depth);
 		double intensity_2 = pow(m.kr[2], traceUI->getDepth() - depth);
@@ -95,7 +97,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 		index.pop();
 
-		bool get_out = (uL.dot(uN) < 0.0);
+		bool get_out = (uL.dot(uN) -RAY_EPSILON< 0.0);
 		if (get_out) {
 			uN = -uN;
 			index.push(1.0);
@@ -106,11 +108,11 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		double cosi = uL.dot(uN);
 		bool total_reflect = (sqrt(1 - cosi * cosi)>= 1/ratio);
 		if (!total_reflect) {
-			double cost = sqrt(1 - ratio * ratio*(1 - cosi * cosi));
+			double cost = sqrt(1 - ratio * ratio*(1 - cosi));
 			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
 			
-			ray refracted_ray(P, uT);
-
+			ray refracted_ray(P, uT); 
+			
 			intensity_0 = pow(m.kt[0], traceUI->getDepth() - depth);
 			intensity_1 = pow(m.kt[1], traceUI->getDepth() - depth);
 			intensity_2 = pow(m.kt[2], traceUI->getDepth() - depth);
@@ -130,6 +132,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		return I.clamp();
 	
 	} else {
+		
 		// No intersection.  This ray travels to infinity, so we color
 		// it according to the background color, which in this (simple) case
 		// is just black.
