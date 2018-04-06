@@ -37,6 +37,7 @@ public:
 	Fl_Slider*			m_samplingSlider;
 	Fl_Light_Button*    m_adapativeSampling;
 	Fl_Light_Button*    m_textureMapping;
+	Fl_Light_Button*    m_background;
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -55,10 +56,11 @@ public:
 	void		setQuadraAttenuation(double value);
 	bool		m_nAdaptive;
 	bool		m_nTexture;
+	bool		m_nBackground;
 	int			m_nSamplingSize;
-	
-private:
 	RayTracer*	raytracer;
+private:
+	
 
 	int			m_nSize;
 	int			m_nDepth;
@@ -92,6 +94,7 @@ private:
 	static void cb_samplingSlides(Fl_Widget* o, void* v);
 	static void cb_adaptive(Fl_Widget* o, void* v);
 	static void cb_texture(Fl_Widget* o, void* v);
+	static void cb_background(Fl_Widget* o, void* v);
 
 	static void cb_render(Fl_Widget* o, void* v);
 	static void cb_stop(Fl_Widget* o, void* v);

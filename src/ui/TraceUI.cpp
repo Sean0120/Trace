@@ -48,17 +48,18 @@ void TraceUI::cb_load_texture(Fl_Menu_* o, void* v) {
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", NULL);
 	if (newfile != NULL) {
 		unsigned char*	data;
-		int				width,height;
+		int				width, height;
 
 		if ((data = readBMP(newfile, width, height)) == NULL)
 		{
 			fl_alert("Can't load bitmap file");
-			return ;
+			return;
 		}
 		pUI->raytracer->scene->m_ucBitmap = data;
 		pUI->raytracer->scene->m_nTextureHeight = height;
 		pUI->raytracer->scene->m_nTextureWidth = width;
-
+	}
+}
 void TraceUI::cb_load_background(Fl_Menu_* o, void* v)
 {
 	TraceUI* pUI = whoami(o);
@@ -157,7 +158,10 @@ void TraceUI::cb_texture(Fl_Widget* o, void* v) {
 
 	((TraceUI*)(o->user_data()))->m_nTexture = !((TraceUI*)(o->user_data()))->m_nTexture;
 }
+void TraceUI::cb_background(Fl_Widget* o, void* v) {
 
+	((TraceUI*)(o->user_data()))->m_nBackground = !((TraceUI*)(o->user_data()))->m_nBackground;
+}
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -319,6 +323,7 @@ TraceUI::TraceUI() {
 	m_nSamplingSize = 0;
 	m_nAdaptive = FALSE;
 	m_nTexture = FALSE;
+	m_nBackground = FALSE;
 	m_mainWindow = new Fl_Window(100, 40, 400, 400, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -422,6 +427,9 @@ TraceUI::TraceUI() {
 		m_textureMapping->user_data((void*)(this));
 		m_textureMapping->callback(cb_texture);
 
+		m_background = new Fl_Light_Button(100, 205, 80, 20, "background");
+		m_background->user_data((void*)(this));
+		m_background->callback(cb_background);
 
 		m_renderButton = new Fl_Button(240, 27, 70, 25, "&Render");
 		m_renderButton->user_data((void*)(this));
