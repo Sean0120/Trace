@@ -40,12 +40,16 @@ void Sphere::isectToTexture(const isect& i, const vec3f& pos, double& x, double&
 	vec3f Sn = i.N;
 	double phi = acos(-Sn * Sp);
 	y = phi / M_PI;
-	if (y == 0 || y == 1)
+	if (abs(y) <= RAY_EPSILON || abs(y - 1) <= RAY_EPSILON)
 	{
 		x = 0;
 		return;
 	}
-	double theta = acos((Se * Sn) / sin(phi)) / (2 * M_PI);
+	double theta;
+	if (abs((Se * Sn) / sin(phi) - 1) <= RAY_EPSILON)
+		theta = 0.0;
+	else
+		theta = acos((Se * Sn) / sin(phi)) / (2 * M_PI);
 	if (Sp.cross(Se)*Sn > 0) {
 		x = theta;
 	}
