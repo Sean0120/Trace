@@ -130,6 +130,14 @@ void TraceUI::cb_quadraAttenSlides(Fl_Widget* o, void* v) {
 void TraceUI::cb_samplingSlides(Fl_Widget* o, void* v) {
 	((TraceUI*)(o->user_data()))->m_nSamplingSize = int(((Fl_Slider *)o)->value());
 }
+
+void TraceUI::cb_BVHButton(Fl_Widget* o, void* v) {
+	TraceUI* pUI = ((TraceUI*)(o->user_data()));
+
+	if (pUI->m_nallowBVH == true) pUI->m_nallowBVH = false;
+	else pUI->m_nallowBVH = true;
+}
+
 void TraceUI::cb_render(Fl_Widget* o, void* v)
 {
 	char buffer[256];
@@ -263,6 +271,10 @@ void TraceUI::setQuadraAttenuation(double value) {
 	m_quadraAttenSlider->value(value);
 }
 
+bool TraceUI::getAllowBVH() {
+	return m_nallowBVH;
+}
+
 // menu definition
 Fl_Menu_Item TraceUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -288,6 +300,8 @@ TraceUI::TraceUI() {
 	m_nlinearAtten = 0.2;
 	m_nquadraAtten = 0.0;
 	m_nSamplingSize = 0;
+	m_nallowBVH = false;
+
 	m_mainWindow = new Fl_Window(100, 40, 350, 400, "Ray <Not Loaded>");
 		m_mainWindow->user_data((void*)(this));	// record self to be used by static callback functions
 		// install menu bar
@@ -370,7 +384,7 @@ TraceUI::TraceUI() {
 		m_quadraAttenSlider->align(FL_ALIGN_RIGHT);
 		m_quadraAttenSlider->callback(cb_quadraAttenSlides);
 
-		//quadratic attenuation
+		//super sampling
 		m_samplingSlider = new Fl_Value_Slider(10, 180, 200, 20, "Sampling Size");
 		m_samplingSlider->user_data((void*)(this));	// record self to be used by static callback functions
 		m_samplingSlider->type(FL_HOR_NICE_SLIDER);
@@ -392,6 +406,10 @@ TraceUI::TraceUI() {
 		m_stopButton = new Fl_Button(240, 55, 70, 25, "&Stop");
 		m_stopButton->user_data((void*)(this));
 		m_stopButton->callback(cb_stop);
+
+		m_BVHButton = new Fl_Light_Button(240, 240, 70, 25, "BVH");
+		m_BVHButton->user_data((void*)(this));
+		m_BVHButton->callback(cb_BVHButton);
 
 		m_mainWindow->callback(cb_exit2);
 		m_mainWindow->when(FL_HIDE);

@@ -144,108 +144,113 @@ Scene::~Scene()
 // intersection through the reference parameter.
 bool Scene::intersect( const ray& r, isect& i ) const
 {
-	/*typedef list<Geometry*>::const_iterator iter;
-	iter j;
+	if (traceUI->getAllowBVH() == false) {
+		typedef list<Geometry*>::const_iterator iter;
+		iter j;
 
-	isect cur;
-	bool have_one = false;
+		isect cur;
+		bool have_one = false;
 
-	// try the non-bounded objects
-	for( j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
-			}
-		}
-	}
-
-	// try the bounded objects
-	for( j = boundedobjects.begin(); j != boundedobjects.end(); ++j ) {
-		if( (*j)->intersect( r, cur ) ) {
-			if( !have_one || (cur.t < i.t) ) {
-				i = cur;
-				have_one = true;
-			}
-		}
-	}
-
-
-	return have_one;*/
-	bool have_one = false;
-	
-	double tMax, tMin;
-	if (BVH_Root == NULL || BVH_Root->box.intersect(r, tMin, tMax) == false) {
-		return false;
-	}
-
-
-	stack<BVH_Node*> node;
-	double tMaxl, tMinl, tMaxr, tMinr;
-	double minT= 1.0e308;
-	isect curI;
-	BVH_Node* curN = BVH_Root;
-	while (true) {
-		if (!curN->isLeaf) {
-			bool li = false;
-			bool ri = false;
-			if (curN->left != NULL){
-				li = curN->left->box.intersect(r, tMinl, tMaxl);
-				tMinl = (tMinl < 0.0 ? tMaxl : tMinl);
-			}
-			if (curN->right != NULL) {
-				ri = curN->right->box.intersect(r, tMinr, tMaxr);
-				tMinr = (tMinr < 0.0 ? tMaxr : tMinr);
-			}
-			if (li&&ri) {
-				node.push(curN->right);
-				curN = curN->left;
-				continue;
-				/*if (tMinl - RAY_EPSILON <= tMinr) {
-					node.push(curN->right);
-					curN = curN->left;
-					continue;
-				}
-				else {
-					node.push(curN->left);
-					curN = curN->right;
-					continue;
-				}*/
-			}
-			else if (li == true) {
-				curN = curN->left;
-				continue;
-			}else if (ri == true) {
-				curN = curN->right;
-				continue;
-			}
-		}
-		else {
-			if (curN->obj->intersect(r, curI)) {
-				if (have_one != true||curI.t - RAY_EPSILON <= i.t) {
-					i = curI;
+		// try the non-bounded objects
+		for (j = nonboundedobjects.begin(); j != nonboundedobjects.end(); ++j) {
+			if ((*j)->intersect(r, cur)) {
+				if (!have_one || (cur.t < i.t)) {
+					i = cur;
 					have_one = true;
 				}
 			}
 		}
-		if (node.empty()) {
-			return have_one;
-		}
-		curN = node.top();
-		node.pop();
-		/*while (!node.empty()) {
-			BVH_Node* check = node.top();
-			node.pop();
-			if (check->box.intersect(r, tMin, tMax))
-				tMin = (tMin < 0.0 ? tMax : tMin);
-				if (tMin - RAY_EPSILON < i.t){
-					curN = check;
-					break;
+
+		// try the bounded objects
+		for (j = boundedobjects.begin(); j != boundedobjects.end(); ++j) {
+			if ((*j)->intersect(r, cur)) {
+				if (!have_one || (cur.t < i.t)) {
+					i = cur;
+					have_one = true;
 				}
+			}
+		}
+
+
+		return have_one;
+	}
+	else {
+		bool have_one = false;
+
+		double tMax, tMin;
+		if (BVH_Root == NULL || BVH_Root->box.intersect(r, tMin, tMax) == false) {
+			return false;
+		}
+
+
+		stack<BVH_Node*> node;
+		double tMaxl, tMinl, tMaxr, tMinr;
+		double minT = 1.0e308;
+		isect curI;
+		BVH_Node* curN = BVH_Root;
+		while (true) {
+			if (!curN->isLeaf) {
+				bool li = false;
+				bool ri = false;
+				if (curN->left != NULL) {
+					li = curN->left->box.intersect(r, tMinl, tMaxl);
+					tMinl = (tMinl < 0.0 ? tMaxl : tMinl);
+				}
+				if (curN->right != NULL) {
+					ri = curN->right->box.intersect(r, tMinr, tMaxr);
+					tMinr = (tMinr < 0.0 ? tMaxr : tMinr);
+				}
+				if (li&&ri) {
+					node.push(curN->right);
+					curN = curN->left;
+					continue;
+					/*if (tMinl - RAY_EPSILON <= tMinr) {
+						node.push(curN->right);
+						curN = curN->left;
+						continue;
+					}
+					else {
+						node.push(curN->left);
+						curN = curN->right;
+						continue;
+					}*/
+				}
+				else if (li == true) {
+					curN = curN->left;
+					continue;
+				}
+				else if (ri == true) {
+					curN = curN->right;
+					continue;
+				}
+			}
+			else {
+				if (curN->obj->intersect(r, curI)) {
+					if (have_one != true || curI.t - RAY_EPSILON <= i.t) {
+						i = curI;
+						have_one = true;
+					}
+				}
+			}
 			if (node.empty()) {
 				return have_one;
 			}
-		}*/
+			curN = node.top();
+			node.pop();
+			/*while (!node.empty()) {
+				BVH_Node* check = node.top();
+				node.pop();
+				if (check->box.intersect(r, tMin, tMax))
+					tMin = (tMin < 0.0 ? tMax : tMin);
+					if (tMin - RAY_EPSILON < i.t){
+						curN = check;
+						break;
+					}
+				if (node.empty()) {
+					return have_one;
+				}
+			}*/
+		}
 	}
 }
 
@@ -285,9 +290,6 @@ void Scene::initScene()
 	BVH_size = 1;
 	buildBVH(BVH_Root, obj);
 
-	std::cout << obj.size() << std::endl;
-	std::cout << BVH_size << std::endl;
-	std::cout << getBVHSize(BVH_Root) << std::endl;
 }
 
 vec3f Scene::getAmbientLight() const {
