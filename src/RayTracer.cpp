@@ -95,7 +95,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 			I = I + prod(m.kr,traceRay(scene, reflected_ray, thresh, depth - 1));
 		index.pop();
 
-		bool get_out = (uL.dot(uN) < 0.0);
+		bool get_out = (uL.dot(uN) -RAY_EPSILON< 0.0);
 		if (get_out) {
 			uN = -uN;
 			index.push(1.0);
@@ -106,7 +106,7 @@ vec3f RayTracer::traceRay( Scene *scene, const ray& r,
 		double cosi = uL.dot(uN);
 		bool total_reflect = (sqrt(1 - cosi * cosi)>= 1/ratio);
 		if (!total_reflect) {
-			double cost = sqrt(1 - ratio * ratio*(1 - cosi * cosi));
+			double cost = sqrt(1 - ratio * ratio*(1 - cosi));
 			vec3f uT = ((ratio*cosi - cost)*uN - ratio * uL).normalize();
 			
 			ray refracted_ray(P, uT);
