@@ -176,7 +176,6 @@ bool Scene::intersect( const ray& r, isect& i ) const
 	
 	double tMax, tMin;
 	if (BVH_Root == NULL || BVH_Root->box.intersect(r, tMin, tMax) == false) {
-		//std::cout << "false" << std::endl;
 		return false;
 	}
 
@@ -199,8 +198,10 @@ bool Scene::intersect( const ray& r, isect& i ) const
 				tMinr = (tMinr < 0.0 ? tMaxr : tMinr);
 			}
 			if (li&&ri) {
-				
-				if (tMinl - RAY_EPSILON <= tMinr) {
+				node.push(curN->right);
+				curN = curN->left;
+				continue;
+				/*if (tMinl - RAY_EPSILON <= tMinr) {
 					node.push(curN->right);
 					curN = curN->left;
 					continue;
@@ -209,7 +210,7 @@ bool Scene::intersect( const ray& r, isect& i ) const
 					node.push(curN->left);
 					curN = curN->right;
 					continue;
-				}
+				}*/
 			}
 			else if (li == true) {
 				curN = curN->left;
@@ -230,7 +231,9 @@ bool Scene::intersect( const ray& r, isect& i ) const
 		if (node.empty()) {
 			return have_one;
 		}
-		while (!node.empty()) {
+		curN = node.top();
+		node.pop();
+		/*while (!node.empty()) {
 			BVH_Node* check = node.top();
 			node.pop();
 			if (check->box.intersect(r, tMin, tMax))
@@ -242,7 +245,7 @@ bool Scene::intersect( const ray& r, isect& i ) const
 			if (node.empty()) {
 				return have_one;
 			}
-		}
+		}*/
 	}
 }
 
