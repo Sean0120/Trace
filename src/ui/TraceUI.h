@@ -35,13 +35,13 @@ public:
 	Fl_Slider*			m_linearAttenSlider;
 	Fl_Slider*			m_quadraAttenSlider;
 	Fl_Slider*			m_samplingSlider;
-<<<<<<< HEAD
+
 	Fl_Light_Button*    m_adapativeSampling;
 	Fl_Light_Button*    m_textureMapping;
 	Fl_Light_Button*    m_background;
-=======
+
 	Fl_Light_Button*	m_BVHButton;
->>>>>>> dev_WANG
+
 	TraceGLWindow*		m_traceGlWindow;
 
 	// member functions
@@ -58,14 +58,14 @@ public:
 	void		setConstAttenuation(double value);
 	void		setLinearAttenuation(double value);
 	void		setQuadraAttenuation(double value);
-<<<<<<< HEAD
+
 	bool		m_nAdaptive;
 	bool		m_nTexture;
 	bool		m_nBackground;
-=======
+
 	bool		getAllowBVH();
 
->>>>>>> dev_WANG
+
 	int			m_nSamplingSize;
 	RayTracer*	raytracer;
 private:
